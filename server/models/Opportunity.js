@@ -26,8 +26,11 @@ const opportunitySchema = new mongoose.Schema({
   description: { type: String, required: [true, 'Description is required'], maxlength: 6000 },
   requiredSkills: [{ type: String, trim: true }],
   eligibility: { type: String, maxlength: 2000 },
+  experience: { type: String },
+  education: { type: String },
   location: { type: String, default: 'Remote' },
   workMode: { type: String, enum: ['Remote', 'Hybrid', 'Onsite'], default: 'Remote' },
+
   salary: { type: String },
   salaryMin: { type: Number },
   salaryMax: { type: Number },

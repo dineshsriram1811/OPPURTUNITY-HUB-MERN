@@ -17,7 +17,7 @@ const Unauthorized = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #FFF1F2 0%, #FEF2F2 50%, #F8FAFC 100%)',
+        background: 'linear-gradient(135deg, #FFF1F2 0%, #FEF2F2 50%, #F7FAFC 100%)',
         padding: '2rem',
       }}
     >
@@ -53,7 +53,7 @@ const Unauthorized = () => {
           style={{
             fontSize: '5rem',
             fontWeight: '900',
-            fontFamily: 'Plus Jakarta Sans, sans-serif',
+            fontFamily: '"Forum", serif',
             background: 'linear-gradient(135deg, #EF4444, #DC2626)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -70,8 +70,8 @@ const Unauthorized = () => {
           style={{
             fontSize: '1.75rem',
             fontWeight: '800',
-            color: '#0F172A',
-            fontFamily: 'Plus Jakarta Sans, sans-serif',
+            color: '#111827',
+            fontFamily: '"Forum", serif',
             marginBottom: '0.875rem',
           }}
         >
@@ -81,7 +81,7 @@ const Unauthorized = () => {
         {/* Description */}
         <p
           style={{
-            color: '#64748B',
+            color: '#475569',
             fontSize: '1rem',
             lineHeight: 1.75,
             marginBottom: '0.5rem',
@@ -93,7 +93,7 @@ const Unauthorized = () => {
           This area is restricted to{' '}
           <strong style={{ color: '#EF4444' }}>Administrators</strong> only.
           {user && user.role === 'student' && (
-            <> Your account is registered as a <strong style={{ color: '#2563EB' }}>Student</strong>.</>
+            <> Your account is registered as a <strong style={{ color: '#1677C8' }}>Student</strong>.</>
           )}
         </p>
 
@@ -111,7 +111,7 @@ const Unauthorized = () => {
           <div style={{ fontSize: '0.8125rem', color: '#B91C1C', fontWeight: '600', marginBottom: '0.375rem' }}>
             🔒 Why am I seeing this?
           </div>
-          <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#64748B', fontSize: '0.8125rem', lineHeight: 1.8 }}>
+          <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#475569', fontSize: '0.8125rem', lineHeight: 1.8 }}>
             <li>You tried to access an admin-only page</li>
             <li>Your account role does not have admin privileges</li>
             <li>If you believe this is a mistake, contact support</li>

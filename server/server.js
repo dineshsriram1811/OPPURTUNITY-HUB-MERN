@@ -11,6 +11,7 @@ const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error.middleware');
 const { generalLimiter } = require('./middleware/rateLimiter.middleware');
 const { ensureAdminExists } = require('./utils/createAdmin');
+const { generateDemoOpportunities } = require('./utils/seedData');
 
 
 // ── Route imports ─────────────────────────────────────────────────────────────
@@ -27,12 +28,14 @@ const freelancingRoutes = require("./routes/freelancing.routes");
 const hackathonRoutes = require("./routes/hackathon.routes");
 const scholarshipRoutes = require("./routes/scholarship.routes");
 
-// ── Connect DB & ensure default admin exists ─────────────────────────────────
-// Opportunities are managed exclusively via the Admin panel — no auto-seeding.
+// ── Connect DB, ensure admin, and seed demo opportunities ───────────────────
 connectDB().then(() => {
   ensureAdminExists().catch((err) =>
     console.error('⚠️  Admin ensure failed:', err.message)
   );
+  generateDemoOpportunities()
+    .then((res) => console.log(`✅  Demo opportunities verified (${res.count} items)`))
+    .catch((err) => console.error('⚠️  Demo seed failed:', err.message));
 });
 
 const app    = express();

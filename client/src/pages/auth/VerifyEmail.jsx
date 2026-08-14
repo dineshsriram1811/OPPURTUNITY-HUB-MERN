@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiCheckCircle, FiXCircle, FiZap, FiArrowRight } from 'react-icons/fi';
+import { FiCheckCircle, FiXCircle, FiArrowRight, FiRefreshCw } from 'react-icons/fi';
 import api from '../../services/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import AuthCard from '../../components/auth/AuthCard';
+import { AuthIllustrationVerify } from '../../components/auth/AuthIllustrations';
 
 const VerifyEmail = () => {
   const { token } = useParams();
@@ -25,57 +26,78 @@ const VerifyEmail = () => {
   }, [token]);
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #EFF6FF 0%, #EEF2FF 60%, #F8FAFC 100%)', padding: '2rem' }}>
-      <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} style={{ width: '100%', maxWidth: '440px', textAlign: 'center' }}>
+    <AuthCard illustration={<AuthIllustrationVerify />} maxWidth="max-w-4xl">
+      <div className="max-w-md text-left">
+        {/* Heading & Subtitle matching Reference Image */}
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2 font-display tracking-wide">
+          Verify Your Email
+        </h1>
+        <p className="text-blue-100/90 text-sm sm:text-base mb-6 font-normal leading-relaxed">
+          We've sent a verification link to your email address.
+        </p>
 
-        <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.625rem', marginBottom: '2rem', textDecoration: 'none' }}>
-          <div style={{ width: '38px', height: '38px', borderRadius: '11px', background: 'linear-gradient(135deg, #2563EB, #4F46E5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <FiZap size={20} color="white" />
-          </div>
-          <span style={{ fontSize: '1.125rem', fontWeight: '800', color: '#0F172A', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-            Opportunity<span style={{ color: '#2563EB' }}>Hub</span>
-            <span style={{ color: '#94A3B8', fontSize: '0.7rem', fontWeight: '600', marginLeft: '4px' }}>2.0</span>
-          </span>
-        </Link>
-
-        <div style={{ background: 'white', borderRadius: '1.5rem', padding: '2.5rem', border: '1px solid #E2E8F0', boxShadow: '0 8px 32px rgba(0,0,0,0.06)' }}>
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 my-4 text-center">
           {status === 'loading' && (
-            <div style={{ padding: '1rem 0' }}>
-              <LoadingSpinner size="lg" text="Verifying your email..." />
+            <div className="py-6 flex flex-col items-center gap-3">
+              <LoadingSpinner size="lg" text="" color="#34D399" />
+              <span className="text-sm font-semibold text-white">Verifying your email...</span>
             </div>
           )}
 
           {status === 'success' && (
-            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 200 }}>
-              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #D1FAE5, #6EE7B7)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 0 0 8px rgba(16,185,129,0.08)' }}>
-                <FiCheckCircle size={40} color="#059669" />
+            <div className="py-2">
+              <div className="w-16 h-16 rounded-full bg-[#34D399] text-[#0F172A] flex items-center justify-center mx-auto mb-4 shadow-lg border-2 border-white">
+                <FiCheckCircle size={32} />
               </div>
-              <h1 style={{ fontSize: '1.625rem', fontWeight: '800', color: '#0F172A', marginBottom: '0.625rem', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Email Verified! 🎉</h1>
-              <p style={{ color: '#64748B', fontSize: '0.9375rem', lineHeight: 1.7, marginBottom: '2rem' }}>{message}</p>
-              <Link to="/login" className="btn-primary" style={{ justifyContent: 'center', padding: '0.9375rem', fontSize: '1rem', display: 'flex' }}>
-                Sign In to Your Account <FiArrowRight />
+              <h2 className="text-xl font-extrabold text-white mb-2 font-display">
+                Email Verified Successfully!
+              </h2>
+              <p className="text-blue-100 text-xs sm:text-sm mb-6 leading-relaxed">
+                {message || 'Your account is active. Please check your inbox and click the link to verify your account.'}
+              </p>
+              <Link
+                to="/login"
+                className="auth-btn-mint inline-flex"
+              >
+                <span>Sign In to Your Account</span> <FiArrowRight size={18} />
               </Link>
-            </motion.div>
+            </div>
           )}
 
           {status === 'error' && (
-            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                <FiXCircle size={40} color="#DC2626" />
+            <div className="py-2">
+              <div className="w-16 h-16 rounded-full bg-red-500/20 text-red-300 flex items-center justify-center mx-auto mb-4 border border-red-400/40">
+                <FiXCircle size={32} />
               </div>
-              <h1 style={{ fontSize: '1.625rem', fontWeight: '800', color: '#0F172A', marginBottom: '0.625rem', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Verification Failed</h1>
-              <p style={{ color: '#64748B', fontSize: '0.9375rem', lineHeight: 1.7, marginBottom: '2rem' }}>{message}</p>
-              <Link to="/register" className="btn-primary" style={{ justifyContent: 'center', padding: '0.875rem', display: 'flex', marginBottom: '0.75rem' }}>
-                Register Again
-              </Link>
-              <Link to="/login" style={{ display: 'block', color: '#64748B', fontSize: '0.875rem', textDecoration: 'none', textAlign: 'center', fontWeight: '500' }}>
-                Already verified? Sign In →
-              </Link>
-            </motion.div>
+              <h2 className="text-xl font-extrabold text-white mb-2 font-display">
+                Verification Failed
+              </h2>
+              <p className="text-red-200 text-xs sm:text-sm mb-6 leading-relaxed bg-red-900/30 p-3 rounded-xl border border-red-500/30">
+                {message}
+              </p>
+              <div className="flex flex-col gap-3">
+                <Link
+                  to="/register"
+                  className="auth-btn-mint inline-flex"
+                >
+                  <FiRefreshCw size={16} /> <span>Register Again</span>
+                </Link>
+              </div>
+            </div>
           )}
         </div>
-      </motion.div>
-    </div>
+
+        {/* Resend Email & Change Email Links matching Reference Image */}
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-bold text-center">
+          <Link to="/login" className="text-[#34D399] hover:text-[#6EE7B7] transition-colors">
+            Resend Email
+          </Link>
+          <Link to="/register" className="text-blue-200 hover:text-white transition-colors">
+            Change Email Address
+          </Link>
+        </div>
+      </div>
+    </AuthCard>
   );
 };
 

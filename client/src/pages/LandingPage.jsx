@@ -1,38 +1,38 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiZap, FiArrowRight, FiTrendingUp, FiBriefcase, FiBookOpen, FiCpu, FiUsers, FiCheckCircle } from 'react-icons/fi';
+import { FiZap, FiArrowRight, FiTrendingUp, FiBriefcase, FiBookOpen, FiCpu, FiUsers, FiCheckCircle, FiCompass, FiShield, FiTarget } from 'react-icons/fi';
 import api from '../services/api';
 
-// Static hero stats — aspirational marketing copy
 const heroStats = [
-  { value: '50K+', label: 'Students' },
-  { value: '15K+', label: 'Opportunities' },
-  { value: '92%', label: 'Placement Rate' },
+  { value: '50K+', label: 'Students Empowered' },
+  { value: '15K+', label: 'Verified Listings' },
+  { value: '94%', label: 'Success Rate' },
 ];
 
 const CATEGORIES = [
-  { icon: FiBriefcase,    label: 'Jobs',         slug: 'jobs',         color: '#2563EB', bg: '#EFF6FF' },
-  { icon: FiTrendingUp,   label: 'Internships',  slug: 'internships',  color: '#7C3AED', bg: '#F5F3FF' },
-  { icon: FiUsers,        label: 'Freelancing',  slug: 'freelancing',  color: '#0EA5E9', bg: '#EFF6FF' },
-  { icon: FiCpu,          label: 'Hackathons',   slug: 'hackathons',   color: '#D97706', bg: '#FEF3C7' },
-  { icon: FiBookOpen,     label: 'Scholarships', slug: 'scholarships', color: '#059669', bg: '#D1FAE5' },
+  { icon: FiBriefcase,  label: 'Jobs',         slug: 'jobs' },
+  { icon: FiTrendingUp, label: 'Internships',  slug: 'internships' },
+  { icon: FiUsers,      label: 'Freelancing',  slug: 'freelancing' },
+  { icon: FiCpu,        label: 'Hackathons',   slug: 'hackathons' },
+  { icon: FiBookOpen,   label: 'Scholarships', slug: 'scholarships' },
 ];
 
 const features = [
   {
-    icon: FiCheckCircle,
-    title: 'Verified Opportunities',
-    desc: 'Every company and listing is manually verified by our admin team. No spam, no fake jobs.',
-    color: '#059669',
-    bg: '#ECFDF5',
+    icon: FiShield,
+    title: 'Verified Opportunities Only',
+    desc: 'Every listing is vetted to ensure legitimate companies, transparent roles, and zero spam.',
   },
   {
-    icon: FiUsers,
-    title: 'Mentorship Network',
-    desc: 'Connect with expert mentors and receive guidance on applications, interviews, and career growth.',
-    color: '#2563EB',
-    bg: '#EFF6FF',
+    icon: FiTarget,
+    title: 'Application & Deadline Tracker',
+    desc: 'Never miss a key date. Track your saved opportunities and application deadlines in one calendar.',
+  },
+  {
+    icon: FiCompass,
+    title: 'Direct Career Growth',
+    desc: 'Filter opportunities matched precisely to your technical skills, work mode preference, and goals.',
   },
 ];
 
@@ -44,11 +44,8 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        // Fetch all opportunities count grouped by category in a single call
         const res = await api.get('/opportunities?limit=1');
-        const total = res.data.total || 0;
 
-        // Fetch per-category counts in parallel
         const counts = await Promise.all(
           CATEGORIES.map(async (cat) => {
             try {
@@ -62,11 +59,9 @@ const LandingPage = () => {
         counts.forEach(({ label, count }) => { countMap[label] = count; });
         setCategoryCounts(countMap);
 
-        // Featured count
         const featuredRes = await api.get('/opportunities?isFeatured=true&limit=1');
         setTotalFeatured(featuredRes.data.total || 0);
       } catch (_) {
-        // If API fails, gracefully show 0
         setCategoryCounts({});
         setTotalFeatured(0);
       } finally {
@@ -77,76 +72,90 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div>
+    <div className="bg-[#F7FAFC] text-[#111827] min-h-screen">
       {/* ── Hero Section ──────────────────────────────────────────────────── */}
-      <section style={{ background: 'linear-gradient(135deg, #EFF6FF 0%, #EEF2FF 50%, #F8FAFC 100%)', padding: '5rem 1.5rem', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', width: '500px', height: '500px', top: '-120px', right: '-120px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.12), transparent)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', width: '350px', height: '350px', bottom: '-80px', left: '-80px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(79,70,229,0.1), transparent)', pointerEvents: 'none' }} />
-
-        <div style={{ maxWidth: '860px', margin: '0 auto', textAlign: 'center', position: 'relative' }}>
+      <section className="relative pt-20 pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#0B5FA5] to-[#1677C8] text-white overflow-hidden shadow-md">
+        <div className="max-w-5xl mx-auto text-center relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.375rem 1rem', background: 'white', border: '1.5px solid #BFDBFE', borderRadius: '9999px', fontSize: '0.8125rem', fontWeight: '600', color: '#2563EB', marginBottom: '1.5rem', boxShadow: '0 2px 8px rgba(37,99,235,0.08)' }}>
-              <FiZap size={13} />
-              Introducing OpportunityHub
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md border border-[#18E0C0]/30 rounded-full text-xs font-bold text-[#18E0C0] mb-8 uppercase tracking-widest">
+              <FiZap size={14} className="text-[#18E0C0]" />
+              Discover. Apply. Succeed.
             </div>
 
-            <h1 style={{ fontSize: 'clamp(2.25rem, 5vw, 3.75rem)', fontWeight: '900', color: '#0F172A', fontFamily: 'Plus Jakarta Sans, sans-serif', marginBottom: '1.25rem', lineHeight: 1.15, letterSpacing: '-1px' }}>
-              Land Your{' '}
-              <span style={{ background: 'linear-gradient(135deg, #2563EB, #6366F1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                Dream Career
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight font-display">
+              Find Your <br />
+              <span className="text-[#18E0C0] relative inline-block">
+                Next Opportunity.
               </span>
-              <br />Today
             </h1>
 
-            <p style={{ fontSize: '1.125rem', color: '#64748B', maxWidth: '600px', margin: '0 auto 2.5rem', lineHeight: 1.75 }}>
-              Discover verified jobs, internships, freelancing, hackathons, and scholarships. Find your path and join a thriving student community.
+            <p className="text-lg sm:text-xl text-blue-100 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+              Find verified jobs, internships, freelancing opportunities, hackathons and scholarships — all in one powerful student platform.
             </p>
 
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/register" className="btn-primary" style={{ padding: '0.875rem 2rem', fontSize: '1rem' }}>
-                Get Started Free <FiArrowRight size={17} />
+            <div className="flex flex-wrap gap-4 justify-center items-center">
+              <Link to="/opportunities" className="btn-secondary px-8 py-4 text-base shadow-lg">
+                Explore Opportunities <FiArrowRight size={18} />
               </Link>
-              <Link to="/opportunities" className="btn-outline" style={{ padding: '0.875rem 2rem', fontSize: '1rem' }}>
-                Browse Opportunities
+              <Link to="/register" className="btn-primary px-8 py-4 text-base bg-white text-[#1677C8] hover:bg-blue-50 border-none shadow-lg">
+                Get Started
               </Link>
             </div>
           </motion.div>
 
-          {/* Hero stats — static marketing copy */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }} style={{ display: 'flex', gap: '0', justifyContent: 'center', marginTop: '4rem', flexWrap: 'wrap' }}>
-            {heroStats.map((s, i) => (
-              <div key={s.label} style={{ padding: '1.5rem 2.5rem', textAlign: 'center', borderRight: i < heroStats.length - 1 ? '1px solid #E2E8F0' : 'none' }}>
-                <div style={{ fontSize: '1.875rem', fontWeight: '900', color: '#0F172A', fontFamily: 'Plus Jakarta Sans, sans-serif', marginBottom: '2px' }}>{s.value}</div>
-                <div style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: '500' }}>{s.label}</div>
+          {/* Hero stats banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto mt-20 p-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl"
+          >
+            {heroStats.map((s) => (
+              <div key={s.label} className="text-center p-3">
+                <div className="text-3xl sm:text-4xl font-extrabold text-[#18E0C0] font-display mb-1">{s.value}</div>
+                <div className="text-xs font-bold text-blue-100 uppercase tracking-wider">{s.label}</div>
               </div>
             ))}
           </motion.div>
         </div>
       </section>
 
-      {/* ── Categories Section with LIVE counts ──────────────────────────── */}
-      <section style={{ padding: '5rem 1.5rem', background: 'white' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#0F172A', fontFamily: 'Plus Jakarta Sans, sans-serif', marginBottom: '0.5rem' }}>Explore Opportunities</h2>
-            <p style={{ color: '#64748B', fontSize: '1rem' }}>From entry-level to leadership — find what's right for you</p>
+      {/* ── Categories Section ────────────────────────────────────────────── */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#F7FAFC] text-[#111827]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#111827] font-display mb-3">
+              Explore Categories
+            </h2>
+            <p className="text-[#475569] text-base max-w-xl mx-auto">
+              Curated opportunities across all major pathways for students and early professionals.
+            </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1.25rem' }}>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
             {CATEGORIES.map((cat, i) => {
               const count = categoryCounts[cat.label] ?? 0;
               return (
-                <motion.div key={cat.label} whileHover={{ y: -5 }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-                  <Link to={`/opportunities/${cat.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
-                    <div className="premium-card" style={{ padding: '1.75rem', cursor: 'pointer' }}>
-                      <div style={{ width: '52px', height: '52px', borderRadius: '1rem', background: cat.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
-                        <cat.icon size={24} color={cat.color} />
+                <motion.div
+                  key={cat.label}
+                  whileHover={{ y: -6 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.08 }}
+                >
+                  <Link to={`/opportunities/${cat.slug}`} className="no-underline block h-full">
+                    <div className="bg-white p-6 rounded-2xl border border-[#DDE5EA] hover:border-[#1677C8] shadow-sm hover:shadow-xl transition-all h-full flex flex-col justify-between">
+                      <div>
+                        <div className="w-12 h-12 rounded-xl bg-[#1677C8] flex items-center justify-center mb-5">
+                          <cat.icon size={22} className="text-[#18E0C0]" />
+                        </div>
+                        <h3 className="font-extrabold text-lg text-[#111827] font-display mb-2">{cat.label}</h3>
                       </div>
-                      <div style={{ fontWeight: '800', fontSize: '1.0625rem', color: '#0F172A', fontFamily: 'Plus Jakarta Sans, sans-serif', marginBottom: '4px' }}>{cat.label}</div>
                       {loadingCounts ? (
-                        <div style={{ height: '14px', width: '60px', background: '#E2E8F0', borderRadius: '4px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                        <div className="h-4 w-16 bg-neutral-200 rounded animate-pulse mt-3" />
                       ) : (
-                        <div style={{ fontSize: '0.8125rem', color: count === 0 ? '#94A3B8' : cat.color, fontWeight: '600' }}>
-                          {count === 0 ? 'None yet' : `${count} available`}
+                        <div className="text-xs font-extrabold uppercase tracking-wider text-[#1677C8] mt-3">
+                          {count === 0 ? 'Explore' : `${count} Active`}
                         </div>
                       )}
                     </div>
@@ -158,73 +167,85 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ── Live Opportunities CTA ────────────────────────────────────────── */}
-      <section style={{ padding: '4rem 1.5rem', background: '#F8FAFC' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#0F172A', fontFamily: 'Plus Jakarta Sans, sans-serif', marginBottom: '0.5rem' }}>Live Opportunities</h2>
-            {loadingCounts ? (
-              <p style={{ color: '#64748B', fontSize: '1rem' }}>Loading live listings...</p>
-            ) : totalFeatured > 0 ? (
-              <p style={{ color: '#64748B', fontSize: '1rem' }}>Students can browse <strong style={{ color: '#2563EB' }}>{totalFeatured} featured listings</strong> right now.</p>
-            ) : (
-              <p style={{ color: '#64748B', fontSize: '1rem' }}>No opportunities published yet. Check back soon!</p>
-            )}
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Link to="/opportunities" className="btn-primary" style={{ padding: '0.875rem 1.75rem' }}>Explore All Listings</Link>
-          </div>
+      {/* ── Featured CTA Banner ───────────────────────────────────────────── */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#0B5FA5] text-white">
+        <div className="max-w-5xl mx-auto text-center">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display mb-3">
+            Live Opportunities Waiting For You
+          </h2>
+          <p className="text-blue-100 text-base mb-8 max-w-xl mx-auto">
+            {loadingCounts
+              ? 'Loading active listings...'
+              : `Browse over ${totalFeatured > 0 ? totalFeatured : 'hundreds of'} active job postings, internships, and hackathons updated daily.`}
+          </p>
+          <Link to="/opportunities" className="btn-secondary px-8 py-3.5 text-base">
+            View All Opportunities <FiArrowRight size={18} />
+          </Link>
         </div>
       </section>
 
-      {/* ── Why OpportunityHub ────────────────────────────────────────────── */}
-      <section style={{ padding: '5rem 1.5rem', background: '#F8FAFC' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#0F172A', fontFamily: 'Plus Jakarta Sans, sans-serif', marginBottom: '0.5rem' }}>Why OpportunityHub?</h2>
-            <p style={{ color: '#64748B', fontSize: '1rem' }}>Built for students, trusted by universities</p>
+      {/* ── Why OpportunityHub Section ────────────────────────────────────── */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#F7FAFC] text-[#111827]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#111827] font-display mb-3">
+              Why OpportunityHub?
+            </h2>
+            <p className="text-[#475569] text-base max-w-xl mx-auto">
+              Designed specifically for students seeking quality, transparency, and structure in their career search.
+            </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-            {features.map((f) => (
-              <motion.div key={f.title} className="premium-card" style={{ padding: '2rem' }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} whileHover={{ y: -4 }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '1rem', background: f.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem' }}>
-                  <f.icon size={26} color={f.color} />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((f, i) => (
+              <motion.div
+                key={f.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white p-8 rounded-2xl border border-[#DDE5EA] shadow-sm hover:shadow-md transition-all"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-[#1677C8] flex items-center justify-center mb-6">
+                  <f.icon size={26} className="text-[#18E0C0]" />
                 </div>
-                <h3 style={{ fontSize: '1.0625rem', fontWeight: '700', color: '#0F172A', fontFamily: 'Plus Jakarta Sans, sans-serif', marginBottom: '0.5rem' }}>{f.title}</h3>
-                <p style={{ color: '#64748B', fontSize: '0.9rem', lineHeight: 1.7, margin: 0 }}>{f.desc}</p>
+                <h3 className="text-xl font-extrabold text-[#111827] font-display mb-3">{f.title}</h3>
+                <p className="text-[#475569] text-sm leading-relaxed">{f.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── CTA Section ───────────────────────────────────────────────────── */}
-      <section style={{ padding: '5rem 1.5rem', background: 'linear-gradient(135deg, #1D4ED8, #2563EB, #4F46E5)' }}>
-        <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center', color: 'white' }}>
-          <h2 style={{ fontSize: '2.25rem', fontWeight: '800', fontFamily: 'Plus Jakarta Sans, sans-serif', marginBottom: '1rem', lineHeight: 1.2 }}>
-            Ready to launch your career?
+      {/* ── Final Call to Action ──────────────────────────────────────────── */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#0B5FA5] text-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white font-display mb-6">
+            Ready to Take Your Next Step?
           </h2>
-          <p style={{ fontSize: '1.0625rem', color: 'rgba(255,255,255,0.8)', marginBottom: '2rem', lineHeight: 1.7 }}>
-            Join 50,000+ students who found their dream opportunity through OpportunityHub.
+          <p className="text-blue-100 text-lg mb-10 max-w-xl mx-auto">
+            Join thousands of students applying to top roles and managing deadlines seamlessly.
           </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/register" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.875rem 2rem', background: 'white', color: '#2563EB', borderRadius: '0.875rem', fontWeight: '700', fontSize: '1rem', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.02)'; e.currentTarget.style.boxShadow = '0 0 30px rgba(255,255,255,0.2)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}>
-              Start for Free <FiArrowRight size={17} />
-            </Link>
-            <Link to="/opportunities" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.875rem 2rem', background: 'rgba(255,255,255,0.15)', color: 'white', borderRadius: '0.875rem', fontWeight: '600', fontSize: '1rem', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(6px)' }}>
-              Browse Jobs
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link to="/register" className="btn-secondary px-8 py-4 text-base">
+              Start Free Today <FiArrowRight size={18} />
             </Link>
           </div>
         </div>
       </section>
 
       {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <footer style={{ background: '#0F172A', color: '#94A3B8', padding: '2.5rem 1.5rem', textAlign: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', marginBottom: '0.75rem' }}>
-          <FiZap size={16} color="#2563EB" />
-          <span style={{ fontWeight: '700', color: 'white', fontSize: '0.9375rem' }}>OpportunityHub</span>
+      <footer className="py-10 px-4 sm:px-6 lg:px-8 bg-[#073862] border-t border-[#094B83] text-blue-100 text-center">
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="w-7 h-7 rounded-lg bg-[#1677C8] flex items-center justify-center">
+            <FiZap size={16} className="text-[#18E0C0]" />
+          </div>
+          <span className="font-extrabold text-white text-lg tracking-tight font-display">
+            Opportunity<span className="text-[#18E0C0]">Hub</span>
+          </span>
         </div>
-        <p style={{ fontSize: '0.8125rem', margin: 0 }}>© {new Date().getFullYear()} OpportunityHub. Built with ⚡ for students everywhere.</p>
+        <p className="text-xs text-blue-200 font-medium m-0">
+          Discover. Apply. Succeed. &copy; {new Date().getFullYear()} OpportunityHub. All rights reserved.
+        </p>
       </footer>
     </div>
   );

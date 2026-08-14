@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { FiCheckCircle, FiTrash2, FiAlertTriangle, FiEye } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { FiShield, FiAlertTriangle, FiCheck, FiX, FiTrash2 } from 'react-icons/fi';
 import api from '../../services/api';
-import toast from 'react-hot-toast';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import toast from 'react-hot-toast';
 import { timeAgo } from '../../utils/helpers';
 
 const ManageReports = () => {
@@ -12,9 +12,10 @@ const ManageReports = () => {
 
   const fetchReports = async () => {
     try {
+      setLoading(true);
       const res = await api.get('/admin/reports');
-      setReports(res.data.reports);
-    } catch (err) {
+      setReports(res.data.reports || []);
+    } catch (_) {
       toast.error('Failed to load reports');
     } finally {
       setLoading(false);
@@ -25,97 +26,76 @@ const ManageReports = () => {
     fetchReports();
   }, []);
 
-  const handleResolve = async (id) => {
+  const handleResolve = async (id, status) => {
     try {
-      await api.put(`/admin/reports/${id}/resolve`, { status: 'resolved' });
-      toast.success('Report resolved');
+      await api.put(`/admin/reports/${id}`, { status });
+      toast.success(`Report marked as ${status}`);
       fetchReports();
     } catch (err) {
-      toast.error('Failed to resolve report');
+      toast.error('Failed to update report status');
     }
   };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this report?')) return;
-    try {
-      await api.delete(`/admin/reports/${id}`);
-      toast.success('Report deleted');
-      fetchReports();
-    } catch (err) {
-      toast.error('Failed to delete report');
-    }
-  };
-
-  if (loading) return <div className="flex justify-center py-20"><LoadingSpinner size="lg" /></div>;
 
   return (
-    <div className="page-enter max-w-6xl mx-auto pb-10">
-      <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white font-display flex items-center gap-2">
-          <FiAlertTriangle className="text-yellow-500" /> Manage Reports
+    <div className="page-enter max-w-5xl mx-auto pb-12 font-sans">
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#102A43] font-display flex items-center gap-2">
+          <FiShield className="text-[#1677D2]" /> Manage Reports
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">Review opportunities reported by students.</p>
+        <p className="text-[#62748A] text-sm font-medium mt-1">Review flagged opportunities reported by students.</p>
       </div>
 
-      <div className="premium-card p-0 overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50 dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700">
-            <tr>
-              <th className="py-4 px-6 font-semibold text-gray-600 dark:text-gray-300 text-sm">Opportunity</th>
-              <th className="py-4 px-6 font-semibold text-gray-600 dark:text-gray-300 text-sm">Reported By</th>
-              <th className="py-4 px-6 font-semibold text-gray-600 dark:text-gray-300 text-sm">Reason / Details</th>
-              <th className="py-4 px-6 font-semibold text-gray-600 dark:text-gray-300 text-sm">Status</th>
-              <th className="py-4 px-6 font-semibold text-gray-600 dark:text-gray-300 text-sm text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
-            {reports.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="py-8 text-center text-gray-500">No reports found.</td>
-              </tr>
-            ) : (
-              reports.map((report) => (
-                <tr key={report._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
-                  <td className="py-4 px-6">
-                    {report.opportunity ? (
-                      <Link to={`/opportunities/${report.opportunity._id}`} className="font-semibold text-blue-600 hover:underline flex items-center gap-1">
-                        {report.opportunity.title} <FiEye size={14} />
-                      </Link>
-                    ) : (
-                      <span className="text-gray-400 italic">Deleted Opportunity</span>
-                    )}
-                    <div className="text-xs text-gray-500 mt-1">{report.opportunity?.companyName}</div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="font-medium text-gray-900 dark:text-white">{report.user?.name}</div>
-                    <div className="text-xs text-gray-500">{timeAgo(report.createdAt)}</div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className="badge badge-red capitalize mb-1 inline-block">{report.reason}</span>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate" title={report.details}>
-                      {report.details || 'No additional details'}
+      <div className="bg-white rounded-2xl border border-[#D9E5EF] overflow-hidden shadow-sm font-sans">
+        {loading ? (
+          <div className="py-16 flex justify-center"><LoadingSpinner size="lg" color="#1677D2" /></div>
+        ) : reports.length === 0 ? (
+          <div className="py-16 text-center text-[#62748A]">
+            <FiShield size={36} className="mx-auto mb-3 text-[#94A3B8] block" />
+            <p className="m-0 text-sm font-semibold">No flagged reports found</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-[#D9E5EF]">
+            {reports.map((report) => (
+              <div key={report._id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#FFF8E6] text-[#B47D00] flex items-center justify-center flex-shrink-0 border border-[#F4B942]">
+                    <FiAlertTriangle size={18} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm text-[#102A43]">{report.opportunity?.title || 'Reported Item'}</h3>
+                    <p className="text-xs text-[#62748A] mt-0.5">{report.reason}</p>
+                    <div className="text-[0.6875rem] text-[#94A3B8] mt-1 font-medium">
+                      Reported by {report.user?.name || 'User'} &bull; {timeAgo(report.createdAt)}
                     </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className={`badge ${report.status === 'pending' ? 'badge-yellow' : 'badge-green'} capitalize`}>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 self-end sm:self-auto">
+                  {report.status === 'pending' ? (
+                    <>
+                      <button
+                        onClick={() => handleResolve(report._id, 'resolved')}
+                        className="btn-primary py-1.5 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer"
+                      >
+                        <FiCheck size={14} /> Resolve
+                      </button>
+                      <button
+                        onClick={() => handleResolve(report._id, 'dismissed')}
+                        className="btn-outline py-1.5 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer"
+                      >
+                        <FiX size={14} /> Dismiss
+                      </button>
+                    </>
+                  ) : (
+                    <span className={`badge ${report.status === 'resolved' ? 'badge-green' : 'badge-gray'} text-xs capitalize`}>
                       {report.status}
                     </span>
-                  </td>
-                  <td className="py-4 px-6 text-right space-x-2">
-                    {report.status === 'pending' && (
-                      <button onClick={() => handleResolve(report._id)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Mark Resolved">
-                        <FiCheckCircle size={18} />
-                      </button>
-                    )}
-                    <button onClick={() => handleDelete(report._id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Report">
-                      <FiTrash2 size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

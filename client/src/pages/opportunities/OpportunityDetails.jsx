@@ -8,9 +8,9 @@ import DOMPurify from 'dompurify';
 import api from '../../services/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ReportModal from '../../components/opportunities/ReportModal';
+import CompanyLogo from '../../components/common/CompanyLogo';
 import { timeAgo } from '../../utils/helpers';
 
-// Configure DOMPurify hook to ensure all links open in a new tab with security attributes
 DOMPurify.addHook('afterSanitizeAttributes', (node) => {
   if (node.tagName === 'A') {
     node.setAttribute('target', '_blank');
@@ -18,10 +18,22 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
   }
 });
 
+const decodeEntities = (str) => {
+  if (!str) return '';
+  return String(str)
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ');
+};
+
 const getSanitizedHtml = (htmlContent) => {
   if (!htmlContent) return '';
-  const hasHtml = /<[a-z][\s\S]*>/i.test(htmlContent);
-  const formattedContent = hasHtml ? htmlContent : htmlContent.replace(/\n/g, '<br />');
+  const decoded = decodeEntities(htmlContent);
+  const hasHtml = /<[a-z][\s\S]*>/i.test(decoded);
+  const formattedContent = hasHtml ? decoded : decoded.replace(/\n/g, '<br />');
   return DOMPurify.sanitize(formattedContent, {
     ADD_ATTR: ['target', 'rel'],
   });
@@ -67,17 +79,26 @@ const OpportunityDetails = () => {
 
   const handleApply = async () => {
     if (!user) return toast.error('Please login to apply');
-    if (opp.applyLink) {
-      window.open(opp.applyLink, '_blank', 'noopener,noreferrer');
-      return;
-    }
     setApplying(true);
     try {
-      await api.post(`/applications`, { opportunity: id });
-      setHasApplied(true);
+      if (!hasApplied) {
+        await api.post(`/applications/${id}`);
+        setHasApplied(true);
+      }
+      if (opp.applyLink) {
+        window.open(opp.applyLink, '_blank', 'noopener,noreferrer');
+      }
       toast.success('Successfully applied!');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to apply');
+      const msg = err.response?.data?.message || '';
+      if (msg.toLowerCase().includes('already applied')) {
+        setHasApplied(true);
+        if (opp.applyLink) {
+          window.open(opp.applyLink, '_blank', 'noopener,noreferrer');
+        }
+      } else {
+        toast.error(msg || 'Failed to apply');
+      }
     } finally {
       setApplying(false);
     }
@@ -88,63 +109,70 @@ const OpportunityDetails = () => {
     toast.success('Link copied to clipboard!');
   };
 
-  if (loading) return <div className="py-20 flex justify-center"><LoadingSpinner size="lg" /></div>;
-  if (!opp) return <div className="py-20 text-center text-xl font-bold dark:text-white">Opportunity not found</div>;
+  if (loading) return <div className="py-20 flex justify-center"><LoadingSpinner size="lg" color="#1677D2" /></div>;
+  if (!opp) return <div className="py-20 text-center text-xl font-extrabold text-[#102A43] font-display">Opportunity not found</div>;
+
+  const allSkills = Array.from(new Set([...(opp.requiredSkills || []), ...(opp.skills || [])])).filter(Boolean);
 
   return (
-    <div className="page-enter max-w-5xl mx-auto pb-12 px-4 sm:px-6">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-200 dark:border-slate-800 overflow-hidden shadow-sm mb-8">
-        <div className="h-32 sm:h-48 bg-gradient-primary w-full relative">
-          <div className="absolute top-4 right-4 flex gap-2">
-            <button onClick={handleShare} className="w-10 h-10 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center hover:bg-white/30 transition">
-              <FiShare2 />
+    <div className="page-enter max-w-5xl mx-auto pb-12 px-4 sm:px-6 pt-4 font-sans">
+      {/* Header Banner */}
+      <div className="bg-white rounded-3xl border border-[#D9E5EF] overflow-hidden shadow-sm mb-8">
+        <div className="h-36 sm:h-48 bg-gradient-to-r from-[#123B73] via-[#1677D2] to-[#1E88E5] w-full relative p-6 border-b border-[#0E2E5B] flex justify-end items-start">
+          <div className="flex gap-2">
+            <button
+              onClick={handleShare}
+              className="w-10 h-10 rounded-full bg-white/20 border border-white/30 text-white flex items-center justify-center hover:bg-[#19D3AE] hover:text-[#102A43] transition cursor-pointer"
+              title="Share"
+            >
+              <FiShare2 size={18} />
             </button>
-            <button onClick={handleBookmark} className="w-10 h-10 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center hover:bg-white/30 transition">
-              <FiBookmark fill={isBookmarked ? 'currentColor' : 'none'} />
+            <button
+              onClick={handleBookmark}
+              className={`w-10 h-10 rounded-full border transition cursor-pointer flex items-center justify-center ${
+                isBookmarked ? 'bg-[#19D3AE] text-[#102A43] border-[#19D3AE]' : 'bg-white/20 border-white/30 text-white hover:bg-[#19D3AE] hover:text-[#102A43]'
+              }`}
+              title={isBookmarked ? 'Saved' : 'Save Opportunity'}
+            >
+              <FiBookmark size={18} fill={isBookmarked ? '#102A43' : 'none'} />
             </button>
           </div>
         </div>
         
         <div className="px-6 sm:px-10 pb-8 relative">
-          <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-white border-4 border-white dark:border-slate-900 shadow-lg -mt-12 sm:-mt-16 mb-4 flex items-center justify-center overflow-hidden">
-            {opp.companyLogo ? (
-              <img src={opp.companyLogo} alt={opp.companyName} className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-4xl font-bold text-blue-600">{opp.companyName?.[0]}</span>
-            )}
-          </div>
+          <CompanyLogo opportunity={opp} className="w-24 h-24 sm:w-32 sm:h-32 -mt-12 sm:-mt-16 mb-4 shadow-xl" textClassName="text-2xl sm:text-3xl" />
           
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">{opp.title}</h1>
-              <div className="text-lg font-medium text-blue-600 dark:text-blue-400 mb-4">
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-[#102A43] font-display mb-2">{opp.title}</h1>
+              <div className="text-base font-semibold text-[#62748A] mb-4 font-sans">
                 {opp.companyName}
               </div>
               
-              <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-slate-400">
-                <div className="flex items-center gap-1.5"><FiBriefcase /> <span className="capitalize">{opp.type}</span></div>
-                <div className="flex items-center gap-1.5"><FiMapPin /> <span className="capitalize">{opp.workMode || opp.locationType}</span> • {opp.location || 'Anywhere'}</div>
+              <div className="flex flex-wrap gap-4 text-xs font-semibold text-[#62748A] font-sans">
+                <div className="flex items-center gap-1.5"><FiBriefcase className="text-[#1677D2]" /> <span className="capitalize">{opp.type}</span></div>
+                <div className="flex items-center gap-1.5"><FiMapPin className="text-[#1677D2]" /> <span className="capitalize">{opp.workMode || opp.locationType}</span> • {opp.location || 'Anywhere'}</div>
                 {opp.salary ? (
-                  <div className="flex items-center gap-1.5 font-medium text-gray-900 dark:text-slate-300">
-                    <FiDollarSign /> {opp.salary}
+                  <div className="flex items-center gap-1.5 font-bold text-[#102A43]">
+                    <FiDollarSign className="text-emerald-600" /> {opp.salary}
                   </div>
-                ) : opp.salaryMax && (
-                  <div className="flex items-center gap-1.5 font-medium text-gray-900 dark:text-slate-300">
-                    <FiDollarSign /> {opp.salaryMin ? `${opp.salaryMin} - ` : ''}{opp.salaryMax}
+                ) : opp.salaryMax ? (
+                  <div className="flex items-center gap-1.5 font-bold text-[#102A43]">
+                    <FiDollarSign className="text-emerald-600" /> {opp.salaryMin ? `$${opp.salaryMin} - ` : ''}${opp.salaryMax}
                   </div>
-                )}
-                <div className="flex items-center gap-1.5"><FiClock /> Posted {timeAgo(opp.createdAt)}</div>
+                ) : null}
+                <div className="flex items-center gap-1.5"><FiClock className="text-[#94A3B8]" /> Posted {timeAgo(opp.createdAt || opp.postedDate)}</div>
               </div>
             </div>
             
             <div className="flex-shrink-0 flex flex-col gap-3">
               {hasApplied ? (
-                <button disabled className="btn-secondary min-w-[160px] justify-center opacity-100 cursor-default bg-emerald-50 text-emerald-700 border-emerald-200">
-                  <FiCheckCircle /> Applied
+                <button disabled className="btn-secondary min-w-[160px] justify-center bg-[#E8FBF6] text-[#0C6B58] border-[#19D3AE] opacity-100 cursor-default font-semibold">
+                  <FiCheckCircle size={18} /> Applied
                 </button>
               ) : (
-                <button onClick={handleApply} disabled={applying} className="btn-primary min-w-[160px] justify-center shadow-lg shadow-blue-500/30">
-                  {applying ? <LoadingSpinner size="sm" color="white" /> : 'Apply Now'}
+                <button onClick={handleApply} disabled={applying} className="btn-primary min-w-[160px] justify-center py-3.5 px-6 text-sm font-semibold uppercase tracking-wider rounded-xl cursor-pointer">
+                  {applying ? <LoadingSpinner size="sm" color="#FFFFFF" /> : 'Apply Now'}
                 </button>
               )}
             </div>
@@ -152,63 +180,74 @@ const OpportunityDetails = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 font-sans">
         <div className="lg:col-span-2 space-y-8">
-          <section className="premium-card p-6 sm:p-8">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Job Description</h3>
+          <section className="bg-white rounded-2xl border border-[#D9E5EF] p-6 sm:p-8 shadow-sm">
+            <h3 className="text-xl font-extrabold text-[#102A43] font-display mb-4 pb-2 border-b border-[#D9E5EF]">
+              Job Description
+            </h3>
             <div
-              className="prose dark:prose-invert max-w-none text-gray-600 dark:text-slate-300"
-              dangerouslySetInnerHTML={{ __html: getSanitizedHtml(opp.description) }}
+              className="prose max-w-none text-[#62748A] leading-relaxed font-normal"
+              dangerouslySetInnerHTML={{ __html: getSanitizedHtml(opp.description || 'Description not provided.') }}
             />
           </section>
 
           {opp.eligibility && (
-            <section className="premium-card p-6 sm:p-8">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Eligibility</h3>
+            <section className="bg-white rounded-2xl border border-[#D9E5EF] p-6 sm:p-8 shadow-sm">
+              <h3 className="text-xl font-extrabold text-[#102A43] font-display mb-4 pb-2 border-b border-[#D9E5EF]">
+                Eligibility
+              </h3>
               <div
-                className="prose dark:prose-invert max-w-none text-gray-600 dark:text-slate-300"
+                className="prose max-w-none text-[#62748A] leading-relaxed font-normal"
                 dangerouslySetInnerHTML={{ __html: getSanitizedHtml(opp.eligibility) }}
               />
             </section>
           )}
 
-          {opp.requiredSkills?.length > 0 && (
-            <section className="premium-card p-6 sm:p-8">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Required Skills</h3>
-              <div className="prose dark:prose-invert max-w-none text-gray-600 dark:text-slate-300 whitespace-pre-wrap">
-                {opp.requiredSkills.join(', ')}
+          {allSkills.length > 0 && (
+            <section className="bg-white rounded-2xl border border-[#D9E5EF] p-6 sm:p-8 shadow-sm">
+              <h3 className="text-xl font-extrabold text-[#102A43] font-display mb-4 pb-2 border-b border-[#D9E5EF]">
+                Required Skills
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {allSkills.map((skill, i) => (
+                  <span key={i} className="px-3.5 py-1.5 bg-[#1677D2] text-white font-bold text-xs rounded-xl font-sans">
+                    {skill}
+                  </span>
+                ))}
               </div>
             </section>
           )}
         </div>
 
         <div className="space-y-6">
-          <section className="premium-card p-6">
-            <h3 className="font-bold text-gray-900 dark:text-white mb-4">Skills Required</h3>
-            <div className="flex flex-wrap gap-2">
-              {(opp.requiredSkills || opp.skills || []).map((skill, i) => (
-                <span key={i} className="skill-tag text-sm bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </section>
-
-          <section className="premium-card p-6">
-            <h3 className="font-bold text-gray-900 dark:text-white mb-4">Key Details</h3>
-            <div className="space-y-4">
+          <section className="bg-white rounded-2xl border border-[#D9E5EF] p-6 shadow-sm">
+            <h3 className="font-extrabold text-[#102A43] font-display mb-4 pb-2 border-b border-[#D9E5EF] text-base">
+              Key Details
+            </h3>
+            <div className="space-y-4 text-sm font-sans">
               <div>
-                <div className="text-xs text-gray-500 mb-1">Category</div>
-                <div className="font-medium text-gray-900 dark:text-white">{opp.category || 'N/A'}</div>
+                <div className="text-xs font-semibold text-[#62748A] uppercase tracking-wider mb-1">Category</div>
+                <div className="font-bold text-[#102A43] capitalize">{opp.category || opp.type || 'Jobs'}</div>
               </div>
               <div>
-                <div className="text-xs text-gray-500 mb-1">Work Mode</div>
-                <div className="font-medium text-gray-900 dark:text-white">{opp.workMode || opp.locationType || 'N/A'}</div>
+                <div className="text-xs font-semibold text-[#62748A] uppercase tracking-wider mb-1">Work Mode</div>
+                <div className="font-bold text-[#102A43] capitalize">{opp.workMode || opp.locationType || 'Remote'}</div>
               </div>
+              <div>
+                <div className="text-xs font-semibold text-[#62748A] uppercase tracking-wider mb-1">Location</div>
+                <div className="font-bold text-[#102A43]">{opp.location || 'Anywhere / Remote'}</div>
+              </div>
+              {opp.salary ? (
+                <div>
+                  <div className="text-xs font-semibold text-[#62748A] uppercase tracking-wider mb-1">Compensation</div>
+                  <div className="font-bold text-[#1677D2]">{opp.salary}</div>
+                </div>
+              ) : null}
               {opp.applicationDeadline && (
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Application Deadline</div>
-                  <div className="font-medium text-red-600 font-bold">{new Date(opp.applicationDeadline).toLocaleDateString()}</div>
+                  <div className="text-xs font-semibold text-[#62748A] uppercase tracking-wider mb-1">Application Deadline</div>
+                  <div className="font-bold text-[#E05252]">{new Date(opp.applicationDeadline).toLocaleDateString()}</div>
                 </div>
               )}
             </div>
@@ -216,7 +255,7 @@ const OpportunityDetails = () => {
 
           <button 
             onClick={() => setShowReportModal(true)}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-red-500 mx-auto transition-colors"
+            className="flex items-center gap-2 text-xs font-semibold text-[#62748A] hover:text-[#E05252] mx-auto transition-colors cursor-pointer border-none bg-none font-sans"
           >
             <FiAlertTriangle /> Report this opportunity
           </button>

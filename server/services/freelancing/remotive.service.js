@@ -1,5 +1,16 @@
 const axios = require("axios");
 
+function decodeEntities(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ');
+}
+
 const fetchRemotiveFreelanceJobs = async () => {
   try {
     const url = "https://remotive.com/api/remote-jobs";
@@ -33,7 +44,8 @@ const fetchRemotiveFreelanceJobs = async () => {
       title: job.title,
       companyName: job.company_name || "Unknown",
       companyLogo: job.company_logo || "",
-      description: (job.description || "No description").substring(0, 6000),
+      description: decodeEntities(job.description || "No description").substring(0, 6000),
+
       location: job.candidate_required_location || "Remote",
       workMode: "Remote",
       locationType: "remote",

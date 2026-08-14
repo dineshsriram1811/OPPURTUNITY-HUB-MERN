@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
 import { store } from './store/store';
 
@@ -35,6 +35,14 @@ import ManageReports       from './pages/admin/ManageReports';
 import ManageAnnouncements from './pages/admin/ManageAnnouncements';
 import AdminSettings       from './pages/admin/Settings';
 
+const PublicOpportunitiesGuard = ({ children }) => {
+  const { user } = useSelector(state => state.auth);
+  if (user && user.role === 'student') {
+    return <Navigate to="/student/opportunities" replace />;
+  }
+  return children;
+};
+
 const App = () => (
   <Provider store={store}>
     <BrowserRouter>
@@ -44,12 +52,13 @@ const App = () => (
           duration: 4000,
           style: {
             borderRadius: '0.875rem',
-            fontFamily:   'Inter, system-ui, sans-serif',
+            fontFamily:   '"Forum", serif',
             fontSize:     '0.875rem',
-            fontWeight:   '500',
-            boxShadow:    '0 10px 25px rgba(0,0,0,0.1)',
+            fontWeight:   '600',
+            boxShadow:    '0 10px 25px rgba(0,0,0,0.08)',
+            border:       '1px solid #DDE5EA',
           },
-          success: { style: { background: '#F0FDF4', color: '#065F46', border: '1px solid #A7F3D0' } },
+          success: { style: { background: '#D9FFF8', color: '#075E54', border: '1px solid #18E0C0' } },
           error:   { style: { background: '#FEF2F2', color: '#991B1B', border: '1px solid #FCA5A5' } },
         }}
       />
@@ -58,14 +67,14 @@ const App = () => (
         {/* ── Public Routes ─────────────────────────────────────────────────── */}
         <Route element={<MainLayout />}>
           <Route index element={<LandingPage />} />
-          <Route path="opportunities"                               element={<OpportunitiesList />} />
-          <Route path="opportunities/jobs"                          element={<OpportunitiesList routeCategory="Jobs" />} />
-          <Route path="opportunities/internships"                   element={<OpportunitiesList routeCategory="Internships" />} />
-          <Route path="opportunities/freelancing"                   element={<OpportunitiesList routeCategory="Freelancing" />} />
-          <Route path="opportunities/hackathons"                    element={<OpportunitiesList routeCategory="Hackathons" />} />
-          <Route path="opportunities/scholarships"                  element={<OpportunitiesList routeCategory="Scholarships" />} />
-          <Route path="opportunities/category/:category"            element={<OpportunitiesList />} />
-          <Route path="opportunities/:id"                           element={<OpportunityDetails />} />
+          <Route path="opportunities"                               element={<PublicOpportunitiesGuard><OpportunitiesList /></PublicOpportunitiesGuard>} />
+          <Route path="opportunities/jobs"                          element={<PublicOpportunitiesGuard><OpportunitiesList routeCategory="Jobs" /></PublicOpportunitiesGuard>} />
+          <Route path="opportunities/internships"                   element={<PublicOpportunitiesGuard><OpportunitiesList routeCategory="Internships" /></PublicOpportunitiesGuard>} />
+          <Route path="opportunities/freelancing"                   element={<PublicOpportunitiesGuard><OpportunitiesList routeCategory="Freelancing" /></PublicOpportunitiesGuard>} />
+          <Route path="opportunities/hackathons"                    element={<PublicOpportunitiesGuard><OpportunitiesList routeCategory="Hackathons" /></PublicOpportunitiesGuard>} />
+          <Route path="opportunities/scholarships"                  element={<PublicOpportunitiesGuard><OpportunitiesList routeCategory="Scholarships" /></PublicOpportunitiesGuard>} />
+          <Route path="opportunities/category/:category"            element={<PublicOpportunitiesGuard><OpportunitiesList /></PublicOpportunitiesGuard>} />
+          <Route path="opportunities/:id"                           element={<PublicOpportunitiesGuard><OpportunityDetails /></PublicOpportunitiesGuard>} />
         </Route>
 
         {/* ── Auth Routes ───────────────────────────────────────────────────── */}
@@ -89,6 +98,14 @@ const App = () => (
         }>
           <Route index                element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard"     element={<StudentDashboard />} />
+          <Route path="opportunities"                               element={<OpportunitiesList />} />
+          <Route path="opportunities/jobs"                          element={<OpportunitiesList routeCategory="Jobs" />} />
+          <Route path="opportunities/internships"                   element={<OpportunitiesList routeCategory="Internships" />} />
+          <Route path="opportunities/freelancing"                   element={<OpportunitiesList routeCategory="Freelancing" />} />
+          <Route path="opportunities/hackathons"                    element={<OpportunitiesList routeCategory="Hackathons" />} />
+          <Route path="opportunities/scholarships"                  element={<OpportunitiesList routeCategory="Scholarships" />} />
+          <Route path="opportunities/category/:category"            element={<OpportunitiesList />} />
+          <Route path="opportunities/:id"                           element={<OpportunityDetails />} />
           <Route path="profile"       element={<StudentProfile />} />
           <Route path="applications"  element={<StudentApplications />} />
           <Route path="bookmarks"     element={<Navigate to="/student/applications" replace />} />
@@ -114,11 +131,11 @@ const App = () => (
 
         {/* ── 404 ──────────────────────────────────────────────────────────── */}
         <Route path="*" element={
-          <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+          <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#F7FAFC', fontFamily: '"Forum", serif' }}>
             <div style={{ fontSize: '6rem', marginBottom: '1rem' }}>🔍</div>
-            <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#0F172A', marginBottom: '0.5rem' }}>Page Not Found</h1>
-            <p style={{ color: '#64748B', marginBottom: '1.5rem' }}>The page you're looking for doesn't exist.</p>
-            <a href="/" style={{ padding: '0.75rem 1.75rem', background: 'linear-gradient(135deg, #2563EB, #4F46E5)', color: 'white', borderRadius: '0.875rem', textDecoration: 'none', fontWeight: '700' }}>Go Home</a>
+            <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#111827', marginBottom: '0.5rem' }}>Page Not Found</h1>
+            <p style={{ color: '#475569', marginBottom: '1.5rem' }}>The page you're looking for doesn't exist.</p>
+            <a href="/" style={{ padding: '0.75rem 1.75rem', background: '#1677C8', color: 'white', borderRadius: '0.875rem', textDecoration: 'none', fontWeight: '700' }}>Go Home</a>
           </div>
         } />
       </Routes>

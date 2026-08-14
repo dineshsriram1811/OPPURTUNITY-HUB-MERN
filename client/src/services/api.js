@@ -3,8 +3,9 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
   headers: { 'Content-Type': 'application/json' },
-  timeout: 15000,
+  timeout: import.meta.env.VITE_API_TIMEOUT ? Number(import.meta.env.VITE_API_TIMEOUT) : 30000,
 });
+
 
 // ── Request interceptor: attach Bearer token ───────────────────────────────────
 api.interceptors.request.use(

@@ -37,7 +37,7 @@ const Profile = () => {
         githubUrl: user.githubUrl || '',
         linkedinUrl: user.linkedinUrl || '',
         skills: user.skills || [],
-        interests: user.preferredRoles || [], // Mapping preferredRoles to interests
+        interests: user.preferredRoles || [],
       });
     }
   }, [user]);
@@ -111,43 +111,47 @@ const Profile = () => {
     }
   };
 
-  if (!user) return <LoadingSpinner />;
+  if (!user) return <LoadingSpinner color="#1677D2" />;
 
   return (
-    <div className="page-enter max-w-4xl mx-auto pb-10">
+    <div className="page-enter max-w-4xl mx-auto pb-12 font-sans">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-display">Student Profile</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Manage your personal information, skills, and career interests.</p>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#102A43] font-display mb-1">
+          Student Profile
+        </h1>
+        <p className="text-[#62748A] text-sm font-medium">Manage your personal information, skills, links, and career goals.</p>
       </div>
 
-      <div className="premium-card p-6 mb-8">
+      {/* User Header Card */}
+      <div className="bg-gradient-to-r from-[#123B73] via-[#1677D2] to-[#1E88E5] text-white rounded-2xl p-6 mb-8 border border-[#0E2E5B] shadow-xl">
         <div className="flex flex-col sm:flex-row items-center gap-6">
           <div className="relative">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 flex items-center justify-center">
+            <div className="w-24 h-24 rounded-full overflow-hidden bg-[#123B73] border-2 border-[#19D3AE] flex items-center justify-center">
               {uploading ? (
-                <LoadingSpinner size="sm" />
+                <LoadingSpinner size="sm" color="#19D3AE" />
               ) : user.avatar ? (
                 <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
               ) : (
-                <span className="text-3xl font-bold text-blue-600">{user.name.charAt(0)}</span>
+                <span className="text-3xl font-extrabold text-[#19D3AE] font-display">{user.name.charAt(0)}</span>
               )}
             </div>
-            <label className="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center cursor-pointer shadow-lg transition-colors">
+            <label className="absolute bottom-0 right-0 w-8 h-8 bg-[#19D3AE] text-[#102A43] rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-emerald-300 transition-colors">
               <FiUpload size={14} />
               <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={uploading} />
             </label>
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{user.name}</h2>
-            <p className="text-gray-500 dark:text-gray-400">{user.email}</p>
-            <p className="text-sm mt-2 text-blue-600 dark:text-blue-400 font-medium bg-blue-50 dark:bg-blue-900/30 inline-block px-3 py-1 rounded-full">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-white font-display mb-1">{user.name}</h2>
+            <p className="text-blue-100 text-sm mb-3 font-sans">{user.email}</p>
+            <span className="inline-block px-3 py-1 bg-white/20 text-[#19D3AE] border border-[#19D3AE]/40 rounded-full text-xs font-bold uppercase tracking-wider font-sans">
               Profile Completeness: {user.profileCompletion || 0}%
-            </p>
+            </span>
           </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="premium-card p-6 space-y-6">
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-[#D9E5EF] p-6 sm:p-8 space-y-6 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="form-label">Full Name</label>
@@ -171,14 +175,15 @@ const Profile = () => {
           </div>
           <div className="md:col-span-2">
             <label className="form-label">Bio</label>
-            <textarea name="bio" value={formData.bio} onChange={handleChange} className="form-input resize-none" rows="3" placeholder="Tell us about yourself..."></textarea>
+            <textarea name="bio" value={formData.bio} onChange={handleChange} className="form-input resize-none" rows="3" placeholder="Tell us about your background, career interests, and goals..."></textarea>
           </div>
         </div>
 
-        <hr className="border-gray-200 dark:border-slate-800" />
+        <hr className="border-[#D9E5EF]" />
 
+        {/* Skills */}
         <div>
-          <label className="form-label">Skills</label>
+          <label className="form-label">Technical Skills</label>
           <div className="flex gap-2 mb-3">
             <input 
               type="text" 
@@ -186,24 +191,25 @@ const Profile = () => {
               onChange={(e) => setSkillInput(e.target.value)} 
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
               className="form-input" 
-              placeholder="e.g. React, Python, Data Analysis" 
+              placeholder="e.g. React, Node.js, Python, Data Science" 
             />
-            <button type="button" onClick={addSkill} className="btn-secondary px-4"><FiPlus /></button>
+            <button type="button" onClick={addSkill} className="btn-secondary px-4 py-3 cursor-pointer"><FiPlus size={18} /></button>
           </div>
           <div className="flex flex-wrap gap-2">
             {formData.skills.map((skill, index) => (
-              <span key={index} className="skill-tag flex items-center gap-1 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300">
+              <span key={index} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1677D2] text-white font-bold text-xs rounded-xl font-sans">
                 {skill}
-                <FiX className="cursor-pointer hover:text-red-500" onClick={() => removeSkill(skill)} />
+                <FiX className="cursor-pointer text-[#19D3AE] hover:text-red-300" onClick={() => removeSkill(skill)} />
               </span>
             ))}
           </div>
         </div>
 
-        <hr className="border-gray-200 dark:border-slate-800" />
+        <hr className="border-[#D9E5EF]" />
 
+        {/* Interests */}
         <div>
-          <label className="form-label">Career Interests</label>
+          <label className="form-label">Career Interests & Preferred Roles</label>
           <div className="flex gap-2 mb-3">
             <input 
               type="text" 
@@ -211,23 +217,23 @@ const Profile = () => {
               onChange={(e) => setInterestInput(e.target.value)} 
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addInterest())}
               className="form-input" 
-              placeholder="e.g. Frontend Development, Machine Learning" 
+              placeholder="e.g. Full Stack Developer, AI Researcher" 
             />
-            <button type="button" onClick={addInterest} className="btn-secondary px-4"><FiPlus /></button>
+            <button type="button" onClick={addInterest} className="btn-secondary px-4 py-3 cursor-pointer"><FiPlus size={18} /></button>
           </div>
           <div className="flex flex-wrap gap-2">
             {formData.interests.map((interest, index) => (
-              <span key={index} className="skill-tag bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:border-green-900/50 dark:text-green-400 flex items-center gap-1">
+              <span key={index} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E8FBF6] text-[#0C6B58] border border-[#19D3AE] font-bold text-xs rounded-xl font-sans">
                 {interest}
-                <FiX className="cursor-pointer hover:text-red-500" onClick={() => removeInterest(interest)} />
+                <FiX className="cursor-pointer hover:text-red-600" onClick={() => removeInterest(interest)} />
               </span>
             ))}
           </div>
         </div>
 
         <div className="pt-4 flex justify-end">
-          <button type="submit" className="btn-primary" disabled={saving}>
-            {saving ? <LoadingSpinner size="sm" color="white" /> : <FiSave />}
+          <button type="submit" className="btn-primary py-3.5 px-8 text-xs font-bold uppercase tracking-wider cursor-pointer" disabled={saving}>
+            {saving ? <LoadingSpinner size="sm" color="#FFFFFF" /> : <FiSave size={16} />}
             {saving ? 'Saving...' : 'Save Profile'}
           </button>
         </div>

@@ -10,11 +10,11 @@ import { logout } from '../../store/slices/authSlice';
 import { setSidebarMobile } from '../../store/slices/uiSlice';
 
 const studentLinks = [
-  { to: '/student/dashboard',    icon: FiHome,      label: 'Dashboard' },
-  { to: '/student/profile',      icon: FiUser,      label: 'My Profile' },
-  { to: '/opportunities',        icon: FiBriefcase, label: 'Opportunities' },
-  { to: '/student/applications', icon: FiFileText,  label: 'Tracker' },
-  { to: '/student/calendar',     icon: FiCalendar,  label: 'Calendar' },
+  { to: '/student/dashboard',     icon: FiHome,      label: 'Dashboard' },
+  { to: '/student/profile',       icon: FiUser,      label: 'My Profile' },
+  { to: '/student/opportunities', icon: FiBriefcase, label: 'Opportunities' },
+  { to: '/student/applications',  icon: FiFileText,  label: 'Tracker' },
+  { to: '/student/calendar',      icon: FiCalendar,  label: 'Calendar' },
 ];
 
 const adminLinks = [
@@ -35,9 +35,6 @@ const Sidebar = () => {
 
   const links = user?.role === 'admin' ? adminLinks : studentLinks;
 
-  const roleColors = { student: '#2563EB', admin: '#DC2626' };
-  const roleColor  = roleColors[user?.role] || '#2563EB';
-
   const handleLogout = () => {
     dispatch(setSidebarMobile(false));
     dispatch(logout());
@@ -48,59 +45,59 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* ── Desktop Fixed Sidebar ────────────────────────────────────────── */}
+      {/* ── Desktop Fixed Persistent Sidebar ─────────────────────────── */}
       <aside
         style={{
-          width: sidebarOpen ? '260px' : '72px',
-          minWidth: sidebarOpen ? '260px' : '72px',
+          width: sidebarOpen ? '260px' : '76px',
+          minWidth: sidebarOpen ? '260px' : '76px',
           height: '100vh',
-          background: 'white',
-          borderRight: '1px solid #E2E8F0',
+          background: '#FFFFFF',
+          borderRight: '1px solid #D9E5EF',
           position: 'fixed',
           left: 0,
           top: 0,
           zIndex: 30,
-          transition: 'width 0.3s ease, min-width 0.3s ease',
+          transition: 'width 0.25s ease, min-width 0.25s ease',
         }}
-        className="hidden lg:flex flex-col overflow-y-auto overflow-x-hidden"
+        className="hidden lg:flex flex-col overflow-y-auto overflow-x-hidden shadow-sm"
       >
-        {/* Logo */}
-        <div style={{ padding: sidebarOpen ? '1.25rem 1.25rem 0.75rem' : '1.25rem 0.75rem 0.75rem', display: 'flex', alignItems: 'center', justifyContent: sidebarOpen ? 'space-between' : 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: `linear-gradient(135deg, ${roleColor}, #4F46E5)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <FiZap size={18} color="white" />
+        {/* Brand Logo */}
+        <div style={{ padding: sidebarOpen ? '1.25rem 1.25rem 0.75rem' : '1.25rem 0.75rem 0.75rem', display: 'flex', items: 'center', justifyContent: sidebarOpen ? 'space-between' : 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: '#1677D2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <FiZap size={20} color="#19D3AE" />
             </div>
             {sidebarOpen && (
               <div>
-                <div style={{ fontSize: '1rem', fontWeight: '800', color: '#0F172A', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: 1, whiteSpace: 'nowrap' }}>
-                  OpportunityHub
+                <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#102A43', fontFamily: '"Forum", serif', lineHeight: 1, whiteSpace: 'nowrap' }}>
+                  Opportunity<span style={{ color: '#1677D2' }}>Hub</span>
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* User card */}
-        <div style={{ margin: sidebarOpen ? '0.75rem 1rem' : '0.75rem 0.5rem', padding: sidebarOpen ? '0.875rem' : '0.5rem', background: `linear-gradient(135deg, ${roleColor}10, ${roleColor}05)`, borderRadius: '0.875rem', border: `1px solid ${roleColor}20` }}>
+        {/* User Profile Card */}
+        <div style={{ margin: sidebarOpen ? '0.75rem 1rem' : '0.75rem 0.5rem', padding: sidebarOpen ? '0.875rem' : '0.5rem', background: '#F3F8FC', borderRadius: '1rem', border: '1px solid #D9E5EF' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: sidebarOpen ? 'flex-start' : 'center', gap: '0.75rem' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: `linear-gradient(135deg, ${roleColor}, #4F46E5)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#1677D2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden', border: '2px solid #19D3AE' }}>
               {user?.avatar
                 ? <img src={user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <span style={{ color: 'white', fontWeight: '700', fontSize: '0.875rem' }}>{user?.name?.[0]?.toUpperCase()}</span>}
+                : <span style={{ color: '#FFFFFF', fontWeight: '800', fontSize: '0.875rem', fontFamily: 'Inter, sans-serif' }}>{user?.name?.[0]?.toUpperCase()}</span>}
             </div>
             {sidebarOpen && (
               <div style={{ overflow: 'hidden' }}>
-                <div style={{ fontWeight: '700', fontSize: '0.875rem', color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name}</div>
-                <div style={{ fontSize: '0.7rem', color: roleColor, fontWeight: '600', textTransform: 'capitalize', marginTop: '2px' }}>{user?.role}</div>
+                <div style={{ fontWeight: '700', fontSize: '0.875rem', color: '#102A43', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'Inter, sans-serif' }}>{user?.name}</div>
+                <div style={{ fontSize: '0.7rem', color: '#123B73', fontWeight: '800', textTransform: 'uppercase', marginTop: '1px', fontFamily: 'Inter, sans-serif' }}>{user?.role}</div>
               </div>
             )}
           </div>
         </div>
 
-        {/* Nav links */}
-        <nav style={{ padding: '0 0.5rem', flex: 1 }}>
+        {/* Navigation links */}
+        <nav style={{ padding: '0 0.625rem', flex: 1 }}>
           {sidebarOpen && (
-            <div style={{ fontSize: '0.65rem', fontWeight: '700', color: '#94A3B8', letterSpacing: '1.2px', textTransform: 'uppercase', padding: '0 0.5rem', marginBottom: '0.375rem', marginTop: '0.25rem' }}>
+            <div style={{ fontSize: '0.65rem', fontWeight: '800', color: '#62748A', letterSpacing: '1.2px', textTransform: 'uppercase', padding: '0 0.625rem', marginBottom: '0.5rem', marginTop: '0.5rem', fontFamily: 'Inter, sans-serif' }}>
               Navigation
             </div>
           )}
@@ -112,24 +109,47 @@ const Sidebar = () => {
               className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}
               style={({ isActive }) => ({
                 justifyContent: sidebarOpen ? 'flex-start' : 'center',
-                padding: sidebarOpen ? '0.625rem 0.875rem' : '0.625rem 0',
-                ...(isActive ? { color: roleColor, background: `${roleColor}10` } : {}),
+                padding: sidebarOpen ? '0.75rem 1rem' : '0.75rem 0',
+                marginBottom: '0.35rem',
+                borderRadius: '0.875rem',
+                fontFamily: 'Inter, sans-serif',
+                position: 'relative',
+                overflow: 'hidden',
+                ...(isActive
+                  ? { color: '#FFFFFF', background: '#1677D2', fontWeight: '700' }
+                  : { color: '#62748A' }),
               })}
             >
-              <link.icon size={18} />
-              {sidebarOpen && <span style={{ fontSize: '0.9rem', whiteSpace: 'nowrap' }}>{link.label}</span>}
+              {({ isActive }) => (
+                <>
+                  {/* Mint Indicator Accent for Active Link */}
+                  {isActive && (
+                    <span style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: '4px', background: '#19D3AE', borderRadius: '0 4px 4px 0' }} />
+                  )}
+                  <link.icon size={19} />
+                  {sidebarOpen && <span style={{ fontSize: '0.9375rem', whiteSpace: 'nowrap' }}>{link.label}</span>}
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
 
-        {/* Bottom logout */}
-        <div style={{ padding: '0.75rem 0.5rem', borderTop: '1px solid #F1F5F9', marginTop: 'auto' }}>
-          <button onClick={handleLogout}
+        {/* Sign Out */}
+        <div style={{ padding: '0.75rem 0.625rem', borderTop: '1px solid #D9E5EF', marginTop: 'auto' }}>
+          <button
+            onClick={handleLogout}
             title={!sidebarOpen ? 'Sign Out' : undefined}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: sidebarOpen ? 'flex-start' : 'center', gap: '0.625rem', width: '100%', padding: sidebarOpen ? '0.625rem 0.875rem' : '0.625rem 0', borderRadius: '0.75rem', color: '#EF4444', background: '#FEF2F2', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '0.875rem', transition: 'all 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.background = '#FEE2E2'}
-            onMouseLeave={e => e.currentTarget.style.background = '#FEF2F2'}>
-            <FiLogOut size={18} /> {sidebarOpen && <span>Sign Out</span>}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: sidebarOpen ? 'flex-start' : 'center',
+              gap: '0.75rem', width: '100%', padding: sidebarOpen ? '0.75rem 1rem' : '0.75rem 0',
+              borderRadius: '0.875rem', color: '#E05252', background: 'rgba(224, 82, 82, 0.08)',
+              border: 'none', cursor: 'pointer', fontWeight: '700', fontSize: '0.875rem', transition: 'all 0.2s',
+              fontFamily: 'Inter, sans-serif'
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(224, 82, 82, 0.15)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(224, 82, 82, 0.08)'}
+          >
+            <FiLogOut size={19} /> {sidebarOpen && <span>Sign Out</span>}
           </button>
         </div>
       </aside>
@@ -141,12 +161,12 @@ const Sidebar = () => {
             initial={{ x: -280 }}
             animate={{ x: 0 }}
             exit={{ x: -280 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
             style={{
               width: '260px',
               height: '100vh',
-              background: 'white',
-              borderRight: '1px solid #E2E8F0',
+              background: '#FFFFFF',
+              borderRight: '1px solid #D9E5EF',
               display: 'flex',
               flexDirection: 'column',
               position: 'fixed',
@@ -157,40 +177,44 @@ const Sidebar = () => {
             }}
             className="lg:hidden shadow-2xl"
           >
-            {/* Logo + Mobile Close Button */}
+            {/* Header + Close */}
             <div style={{ padding: '1.25rem 1.25rem 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: `linear-gradient(135deg, ${roleColor}, #4F46E5)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <FiZap size={18} color="white" />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: '#1677D2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <FiZap size={20} color="#19D3AE" />
                 </div>
                 <div>
-                  <div style={{ fontSize: '1rem', fontWeight: '800', color: '#0F172A', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: 1 }}>OpportunityHub</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#102A43', fontFamily: '"Forum", serif', lineHeight: 1 }}>
+                    Opportunity<span style={{ color: '#1677D2' }}>Hub</span>
+                  </div>
                 </div>
               </div>
-              <button onClick={closeMobile}
-                style={{ padding: '0.375rem', borderRadius: '0.5rem', border: 'none', background: '#F1F5F9', cursor: 'pointer', color: '#64748B' }}>
-                <FiX size={18} />
+              <button
+                onClick={closeMobile}
+                style={{ padding: '0.5rem', borderRadius: '0.625rem', border: '1px solid #D9E5EF', background: '#F3F8FC', cursor: 'pointer', color: '#62748A' }}
+              >
+                <FiX size={20} />
               </button>
             </div>
 
-            {/* User card */}
-            <div style={{ margin: '0.75rem 1rem', padding: '0.875rem', background: `linear-gradient(135deg, ${roleColor}10, ${roleColor}05)`, borderRadius: '0.875rem', border: `1px solid ${roleColor}20` }}>
+            {/* User Profile Card */}
+            <div style={{ margin: '0.75rem 1rem', padding: '0.875rem', background: '#F3F8FC', borderRadius: '1rem', border: '1px solid #D9E5EF' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: `linear-gradient(135deg, ${roleColor}, #4F46E5)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#1677D2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden', border: '2px solid #19D3AE' }}>
                   {user?.avatar
                     ? <img src={user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <span style={{ color: 'white', fontWeight: '700', fontSize: '1rem' }}>{user?.name?.[0]?.toUpperCase()}</span>}
+                    : <span style={{ color: '#FFFFFF', fontWeight: '800', fontSize: '1rem', fontFamily: 'Inter, sans-serif' }}>{user?.name?.[0]?.toUpperCase()}</span>}
                 </div>
                 <div style={{ overflow: 'hidden' }}>
-                  <div style={{ fontWeight: '700', fontSize: '0.875rem', color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name}</div>
-                  <div style={{ fontSize: '0.7rem', color: roleColor, fontWeight: '600', textTransform: 'capitalize', marginTop: '2px' }}>{user?.role}</div>
+                  <div style={{ fontWeight: '700', fontSize: '0.875rem', color: '#102A43', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'Inter, sans-serif' }}>{user?.name}</div>
+                  <div style={{ fontSize: '0.7rem', color: '#123B73', fontWeight: '800', textTransform: 'uppercase', marginTop: '2px', fontFamily: 'Inter, sans-serif' }}>{user?.role}</div>
                 </div>
               </div>
             </div>
 
             {/* Nav links */}
             <nav style={{ padding: '0 0.75rem', flex: 1 }}>
-              <div style={{ fontSize: '0.65rem', fontWeight: '700', color: '#94A3B8', letterSpacing: '1.2px', textTransform: 'uppercase', padding: '0 0.5rem', marginBottom: '0.375rem', marginTop: '0.25rem' }}>
+              <div style={{ fontSize: '0.65rem', fontWeight: '800', color: '#62748A', letterSpacing: '1.2px', textTransform: 'uppercase', padding: '0 0.5rem', marginBottom: '0.5rem', marginTop: '0.5rem', fontFamily: 'Inter, sans-serif' }}>
                 Navigation
               </div>
               {links.map(link => (
@@ -199,21 +223,37 @@ const Sidebar = () => {
                   to={link.to}
                   onClick={closeMobile}
                   className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}
-                  style={({ isActive }) => isActive ? { color: roleColor, background: `${roleColor}10` } : {}}
+                  style={({ isActive }) => ({
+                    marginBottom: '0.35rem',
+                    fontFamily: 'Inter, sans-serif',
+                    position: 'relative',
+                    ...(isActive ? { color: '#FFFFFF', background: '#1677D2', fontWeight: '700' } : { color: '#62748A' }),
+                  })}
                 >
-                  <link.icon size={17} />
-                  <span style={{ fontSize: '0.9rem' }}>{link.label}</span>
+                  {({ isActive }) => (
+                    <>
+                      {isActive && (
+                        <span style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: '4px', background: '#19D3AE', borderRadius: '0 4px 4px 0' }} />
+                      )}
+                      <link.icon size={18} />
+                      <span style={{ fontSize: '0.9375rem' }}>{link.label}</span>
+                    </>
+                  )}
                 </NavLink>
               ))}
             </nav>
 
-            {/* Bottom */}
-            <div style={{ padding: '0.75rem', borderTop: '1px solid #F1F5F9', marginTop: 'auto' }}>
-              <button onClick={handleLogout}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', width: '100%', padding: '0.625rem 0.875rem', borderRadius: '0.75rem', color: '#EF4444', background: '#FEF2F2', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '0.875rem', transition: 'all 0.2s' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#FEE2E2'}
-                onMouseLeave={e => e.currentTarget.style.background = '#FEF2F2'}>
-                <FiLogOut size={16} /> Sign Out
+            {/* Sign Out */}
+            <div style={{ padding: '0.75rem', borderTop: '1px solid #D9E5EF', marginTop: 'auto' }}>
+              <button
+                onClick={handleLogout}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%', padding: '0.75rem 1rem',
+                  borderRadius: '0.875rem', color: '#E05252', background: 'rgba(224, 82, 82, 0.08)',
+                  border: 'none', cursor: 'pointer', fontWeight: '700', fontSize: '0.875rem', fontFamily: 'Inter, sans-serif'
+                }}
+              >
+                <FiLogOut size={18} /> Sign Out
               </button>
             </div>
           </motion.aside>

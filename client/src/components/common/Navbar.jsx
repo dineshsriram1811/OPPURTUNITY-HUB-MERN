@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiZap, FiMenu, FiX, FiUser, FiLogOut, FiChevronDown, FiBriefcase, FiGrid } from 'react-icons/fi';
+import { FiZap, FiMenu, FiX, FiUser, FiLogOut, FiChevronDown, FiGrid } from 'react-icons/fi';
 import { logout } from '../../store/slices/authSlice';
 import useOutsideClick from '../../hooks/useOutsideClick';
 
@@ -26,80 +26,95 @@ const Navbar = () => {
   ];
 
   return (
-    <nav style={{
-      background:   'rgba(255,255,255,0.9)',
-      backdropFilter: 'blur(12px)',
-      borderBottom: '1px solid #E2E8F0',
-      position:     'sticky',
-      top:          0,
-      zIndex:       50,
-    }}>
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem', display: 'flex', alignItems: 'center', height: '64px', gap: '2rem' }}>
+    <nav className="bg-white border-b border-[#DDE5EA] sticky top-0 z-50 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-6">
         {/* Logo */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', flexShrink: 0 }}>
-          <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #2563EB, #4F46E5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <FiZap size={18} color="white" />
+        <Link to="/" className="flex items-center gap-2.5 no-underline flex-shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-[#1677C8] flex items-center justify-center shadow-md shadow-blue-500/20">
+            <FiZap size={20} className="text-[#18E0C0]" />
           </div>
-          <span style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0F172A', fontFamily: 'Plus Jakarta Sans, sans-serif', letterSpacing: '-0.3px' }}>
-            Opportunity<span style={{ color: '#2563EB' }}>Hub</span>
+          <span className="text-xl font-extrabold text-[#111827] tracking-tight font-display">
+            Opportunity<span className="text-[#1677C8]">Hub</span>
           </span>
         </Link>
 
         {/* Desktop nav links */}
-        <div style={{ display: 'flex', gap: '0.25rem', flex: 1 }} className="hidden md:flex">
+        <div className="hidden md:flex items-center gap-1 flex-1 ml-6">
           {navLinks.map(link => (
-            <Link key={link.to} to={link.to} style={{ padding: '0.5rem 0.875rem', borderRadius: '0.5rem', color: '#64748B', fontWeight: '500', fontSize: '0.9375rem', textDecoration: 'none', transition: 'all 0.2s' }}
-              onMouseEnter={e => { e.target.style.background = '#EFF6FF'; e.target.style.color = '#2563EB'; }}
-              onMouseLeave={e => { e.target.style.background = 'transparent'; e.target.style.color = '#64748B'; }}>
+            <Link
+              key={link.to}
+              to={link.to}
+              className="px-4 py-2 rounded-lg text-[#475569] hover:text-[#1677C8] hover:bg-[#F7FAFC] font-semibold text-[0.9375rem] transition-all no-underline"
+            >
               {link.label}
             </Link>
           ))}
         </div>
 
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div className="ml-auto flex items-center gap-3">
           {isAuthenticated && user ? (
             <>
               {/* Dashboard link */}
-              <Link to={`/${user.role}/dashboard`}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.875rem', background: '#EFF6FF', color: '#2563EB', borderRadius: '0.625rem', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none' }}
-                className="hidden sm:flex">
-                <FiGrid size={14} /> Dashboard
+              <Link
+                to={`/${user.role}/dashboard`}
+                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#EBF5FF] text-[#1677C8] hover:bg-[#D6ECFF] border border-[#B3D9FF] rounded-xl font-bold text-sm no-underline transition-all"
+              >
+                <FiGrid size={15} /> Dashboard
               </Link>
 
               {/* Profile dropdown */}
-              <div ref={profileRef} style={{ position: 'relative' }}>
-                <button onClick={() => setProfileOpen(p => !p)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.375rem 0.75rem 0.375rem 0.375rem', background: 'white', border: '1.5px solid #E2E8F0', borderRadius: '2rem', cursor: 'pointer', transition: 'all 0.2s' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(135deg, #2563EB, #4F46E5)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    {user.avatar ? <img src={user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ color: 'white', fontWeight: '700', fontSize: '0.875rem' }}>{user.name?.[0]?.toUpperCase()}</span>}
+              <div ref={profileRef} className="relative">
+                <button
+                  onClick={() => setProfileOpen(p => !p)}
+                  className="flex items-center gap-2.5 p-1.5 pl-2.5 bg-[#F7FAFC] border border-[#DDE5EA] hover:border-[#1677C8] rounded-full cursor-pointer transition-all"
+                >
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-[#1677C8] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                    {user.avatar ? (
+                      <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{user.name?.[0]?.toUpperCase()}</span>
+                    )}
                   </div>
-                  <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#0F172A', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} className="hidden sm:block">{user.name}</span>
-                  <FiChevronDown size={14} style={{ color: '#94A3B8', transition: 'transform 0.2s', transform: profileOpen ? 'rotate(180deg)' : 'none' }} />
+                  <span className="text-sm font-bold text-[#111827] max-w-[120px] truncate hidden sm:block">
+                    {user.name}
+                  </span>
+                  <FiChevronDown size={14} className={`text-[#475569] transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 <AnimatePresence>
                   {profileOpen && (
-                    <motion.div initial={{ opacity: 0, y: 8, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.96 }} transition={{ duration: 0.15 }}
-                      style={{ position: 'absolute', right: 0, top: 'calc(100% + 0.5rem)', width: '220px', background: 'white', border: '1px solid #E2E8F0', borderRadius: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.12)', padding: '0.5rem', zIndex: 100 }}>
-                      <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #F1F5F9', marginBottom: '0.25rem' }}>
-                        <div style={{ fontWeight: '700', fontSize: '0.875rem', color: '#0F172A' }}>{user.name}</div>
-                        <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>{user.email}</div>
-                        <span className={`badge mt-1 ${user.role === 'admin' ? 'badge-red' : 'badge-blue'}`} style={{ textTransform: 'capitalize' }}>{user.role}</span>
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 w-56 bg-white border border-[#DDE5EA] rounded-2xl shadow-2xl p-2 z-50"
+                    >
+                      <div className="p-3 border-b border-[#DDE5EA] mb-1">
+                        <div className="font-bold text-sm text-[#111827] truncate">{user.name}</div>
+                        <div className="text-xs text-[#475569] truncate mt-0.5">{user.email}</div>
+                        <span className="inline-block mt-2 px-2.5 py-0.5 bg-[#D9FFF8] text-[#075E54] font-extrabold text-[0.7rem] uppercase rounded-full">
+                          {user.role}
+                        </span>
                       </div>
                       {[
-                        { to: `/${user.role}/dashboard`, icon: FiGrid,    label: 'Dashboard' },
-                        { to: `/${user.role}/profile`,   icon: FiUser,    label: 'Profile' },
+                        { to: `/${user.role}/dashboard`, icon: FiGrid, label: 'Dashboard' },
+                        { to: `/${user.role}/profile`,   icon: FiUser, label: 'Profile' },
                       ].map(item => (
-                        <Link key={item.to} to={item.to} onClick={() => setProfileOpen(false)}
-                          style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', padding: '0.625rem 0.875rem', borderRadius: '0.625rem', color: '#374151', fontSize: '0.875rem', fontWeight: '500', textDecoration: 'none', transition: 'background 0.2s' }}
-                          onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                          <item.icon size={15} /> {item.label}
+                        <Link
+                          key={item.to}
+                          to={item.to}
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[#475569] hover:text-[#1677C8] hover:bg-[#EBF5FF] text-sm font-semibold no-underline transition-all"
+                        >
+                          <item.icon size={16} /> {item.label}
                         </Link>
                       ))}
-                      <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', width: '100%', padding: '0.625rem 0.875rem', borderRadius: '0.625rem', color: '#EF4444', fontSize: '0.875rem', fontWeight: '500', background: 'none', border: 'none', cursor: 'pointer', marginTop: '0.25rem', borderTop: '1px solid #F1F5F9', transition: 'background 0.2s' }}
-                        onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
-                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                        <FiLogOut size={15} /> Sign Out
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-[#E53935] hover:bg-red-50 text-sm font-bold cursor-pointer mt-1 border-t border-[#DDE5EA] transition-all"
+                      >
+                        <FiLogOut size={16} /> Sign Out
                       </button>
                     </motion.div>
                   )}
@@ -108,33 +123,64 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link to="/login" style={{ padding: '0.5rem 1.25rem', color: '#374151', fontWeight: '600', fontSize: '0.9375rem', textDecoration: 'none', borderRadius: '0.625rem', transition: 'all 0.2s', border: '1.5px solid #E2E8F0', background: 'white' }}>Sign In</Link>
-              <Link to="/register" className="btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.9375rem' }}>Get Started</Link>
+              <Link
+                to="/login"
+                className="px-4 py-2 text-[#1677C8] hover:text-[#0B5FA5] font-bold text-sm no-underline border border-[#DDE5EA] rounded-xl hover:bg-[#EBF5FF] transition-all"
+              >
+                Sign In
+              </Link>
+              <Link to="/register" className="btn-primary py-2 px-4 text-sm">
+                Get Started
+              </Link>
             </>
           )}
 
-          {/* Mobile menu button */}
-          <button className="md:hidden" onClick={() => setMobileOpen(o => !o)} style={{ padding: '0.5rem', borderRadius: '0.5rem', border: 'none', background: '#F1F5F9', cursor: 'pointer', color: '#374151' }}>
+          {/* Mobile menu toggle */}
+          <button
+            className="md:hidden p-2 rounded-xl border border-[#DDE5EA] bg-[#F7FAFC] text-[#475569] hover:text-[#1677C8] cursor-pointer"
+            onClick={() => setMobileOpen(o => !o)}
+          >
             {mobileOpen ? <FiX size={20} /> : <FiMenu size={20} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile drawer */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-            style={{ borderTop: '1px solid #E2E8F0', background: 'white', padding: '1rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
-            className="md:hidden">
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden border-t border-[#DDE5EA] bg-white px-4 py-4 flex flex-col gap-2"
+          >
             {navLinks.map(link => (
-              <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)}
-                style={{ padding: '0.75rem', borderRadius: '0.625rem', color: '#374151', fontWeight: '500', textDecoration: 'none', background: '#F8FAFC' }}>{link.label}</Link>
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setMobileOpen(false)}
+                className="px-4 py-3 rounded-xl text-[#475569] hover:text-[#1677C8] hover:bg-[#F7FAFC] font-semibold text-sm no-underline"
+              >
+                {link.label}
+              </Link>
             ))}
             {!isAuthenticated && (
-              <>
-                <Link to="/login" onClick={() => setMobileOpen(false)} style={{ padding: '0.75rem', borderRadius: '0.625rem', color: '#2563EB', fontWeight: '600', textDecoration: 'none', textAlign: 'center', border: '1.5px solid #BFDBFE', background: '#EFF6FF' }}>Sign In</Link>
-                <Link to="/register" onClick={() => setMobileOpen(false)} className="btn-primary" style={{ justifyContent: 'center', padding: '0.75rem' }}>Get Started</Link>
-              </>
+              <div className="flex flex-col gap-2 pt-2 border-t border-[#DDE5EA]">
+                <Link
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="w-full py-3 text-center text-[#1677C8] border border-[#DDE5EA] rounded-xl font-bold text-sm no-underline"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={() => setMobileOpen(false)}
+                  className="btn-primary w-full justify-center py-3"
+                >
+                  Get Started
+                </Link>
+              </div>
             )}
           </motion.div>
         )}

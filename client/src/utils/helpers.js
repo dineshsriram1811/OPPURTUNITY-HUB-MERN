@@ -36,6 +36,7 @@ export const formatDeadline = (deadline) => {
  * Relative time (e.g. "2 hours ago")
  */
 export const timeAgo = (dateStr) => {
+  if (!dateStr) return '';
   const diff    = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(diff / 60000);
   if (minutes < 1)    return 'Just now';
@@ -51,6 +52,52 @@ export const timeAgo = (dateStr) => {
  * Capitalize first letter
  */
 export const capitalize = (str = '') => str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, ' ');
+
+/**
+ * Extract company logo URL from opportunity object supporting all known backend fields
+ */
+export const getCompanyLogoUrl = (opp = {}) => {
+  if (!opp) return null;
+  const url =
+    opp.companyLogo ||
+    opp.company_logo ||
+    opp.logo ||
+    opp.organisation?.logo ||
+    opp.organization?.logo ||
+    opp.image ||
+    opp.banner_mobile?.image_url;
+
+  if (typeof url === 'string' && url.trim().length > 0) {
+    return url.trim();
+  }
+  return null;
+};
+
+/**
+ * Generate 2-character company initials fallback (e.g. Google -> GO, Tata Trusts -> TT, Swiggy -> SW)
+ */
+export const getCompanyInitials = (name = '') => {
+  if (!name || typeof name !== 'string') return 'CO';
+  const clean = name.trim();
+  if (!clean) return 'CO';
+
+  const words = clean.split(/[\s,.-]+/).filter(Boolean);
+
+  if (words.length >= 2) {
+    const firstChar = words[0][0];
+    const secondChar = words[1][0];
+    if (/[a-zA-Z0-9]/.test(firstChar) && /[a-zA-Z0-9]/.test(secondChar)) {
+      return (firstChar + secondChar).toUpperCase();
+    }
+  }
+
+  const firstWord = words[0] || clean;
+  if (firstWord.length >= 2) {
+    return firstWord.substring(0, 2).toUpperCase();
+  }
+
+  return firstWord[0]?.toUpperCase() || 'CO';
+};
 
 /**
  * Get status badge class

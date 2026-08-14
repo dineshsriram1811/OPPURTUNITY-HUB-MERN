@@ -190,7 +190,7 @@ const BulkImportModal = ({ isOpen, onClose, onImported }) => {
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 rounded-2xl bg-[#1677C8] flex items-center justify-center shadow-lg">
                   <MdOutlineCloudUpload className="text-white text-xl" />
                 </div>
                 <div>
@@ -219,16 +219,16 @@ const BulkImportModal = ({ isOpen, onClose, onImported }) => {
                     onClick={() => inputRef.current?.click()}
                     className={`relative flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl p-10 cursor-pointer transition-all select-none ${
                       dragging
-                        ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20 scale-[1.02]'
-                        : 'border-gray-200 dark:border-slate-700 hover:border-violet-400 dark:hover:border-violet-500 hover:bg-gray-50 dark:hover:bg-slate-800/50'
+                        ? 'border-[#1677C8] bg-[#EBF5FF] scale-[1.02]'
+                        : 'border-[#DDE5EA] hover:border-[#1677C8] hover:bg-[#F7FAFC]'
                     }`}
                   >
                     <motion.div
                       animate={{ y: dragging ? -6 : 0 }}
                       transition={{ type: 'spring', stiffness: 300 }}
-                      className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-900/40 dark:to-indigo-900/40 flex items-center justify-center shadow-inner"
+                      className="w-16 h-16 rounded-2xl bg-[#D9FFF8] flex items-center justify-center shadow-inner"
                     >
-                      <FiUpload className="text-2xl text-violet-600 dark:text-violet-400" />
+                      <FiUpload className="text-2xl text-[#1677C8]" />
                     </motion.div>
                     <div className="text-center">
                       <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">
@@ -251,14 +251,14 @@ const BulkImportModal = ({ isOpen, onClose, onImported }) => {
                     />
                   </div>
 
-                  <div className="mt-4 p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30">
-                    <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-2">Required fields per record</p>
+                  <div className="mt-4 p-4 rounded-2xl bg-[#EBF5FF] border border-[#B3D9FF]">
+                    <p className="text-xs font-semibold text-[#0B5FA5] mb-2">Required fields per record</p>
                     <div className="flex flex-wrap gap-1.5">
                       {['title', 'companyName'].map((f) => (
-                        <span key={f} className="text-xs px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-mono font-semibold">{f}</span>
+                        <span key={f} className="text-xs px-2 py-0.5 rounded-md bg-[#D6ECFF] text-[#0B5FA5] font-mono font-semibold">{f}</span>
                       ))}
                     </div>
-                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 opacity-80">All other fields are optional and will be auto-mapped.</p>
+                    <p className="text-xs text-[#1677C8] mt-2 opacity-80">All other fields are optional and will be auto-mapped.</p>
                   </div>
                 </div>
               )}
@@ -269,7 +269,7 @@ const BulkImportModal = ({ isOpen, onClose, onImported }) => {
                   <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700">
                     {isCSV
                       ? <HiOutlineTableCells className="text-green-500 text-2xl flex-shrink-0" />
-                      : <HiOutlineDocumentText className="text-blue-500 text-2xl flex-shrink-0" />
+                      : <HiOutlineDocumentText className="text-[#1677C8] text-2xl flex-shrink-0" />
                     }
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{file.name}</p>
@@ -287,18 +287,18 @@ const BulkImportModal = ({ isOpen, onClose, onImported }) => {
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="flex flex-col items-center gap-1 py-6 rounded-2xl bg-gradient-to-br from-violet-50 to-indigo-50 dark:from-violet-900/20 dark:to-indigo-900/20 border border-violet-100 dark:border-violet-800/30"
+                    className="flex flex-col items-center gap-1 py-6 rounded-2xl bg-[#EBF5FF] border border-[#B3D9FF]"
                   >
-                    <span className="text-5xl font-extrabold text-violet-700 dark:text-violet-400">
+                    <span className="text-5xl font-extrabold text-[#1677C8]">
                       {recordCount.toLocaleString()}
                     </span>
-                    <span className="text-sm font-semibold text-violet-600 dark:text-violet-300">Total Records Found</span>
+                    <span className="text-sm font-semibold text-[#0B5FA5]">Total Records Found</span>
                     {recordCount === 0 && (
                       <p className="text-xs text-red-500 dark:text-red-400 mt-1">No records detected — check your file format.</p>
                     )}
                   </motion.div>
 
-                  <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30 text-xs text-amber-700 dark:text-amber-400">
+                  <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-100 text-xs text-amber-700">
                     <FiAlertCircle size={14} className="flex-shrink-0 mt-0.5" />
                     Duplicates (same title + company + apply link) will be skipped. Invalid records are reported in the summary.
                   </div>
@@ -310,7 +310,7 @@ const BulkImportModal = ({ isOpen, onClose, onImported }) => {
                     <button
                       onClick={handleImport}
                       disabled={recordCount === 0 || importing}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:opacity-90 shadow-md disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-xl bg-[#1677C8] text-white hover:bg-[#0B5FA5] shadow-md disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
                     >
                       <FiUpload size={15} />
                       Import {recordCount > 0 ? `${recordCount.toLocaleString()} Records` : ''}
@@ -335,13 +335,13 @@ const BulkImportModal = ({ isOpen, onClose, onImported }) => {
                       />
                       <defs>
                         <linearGradient id="impGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#7c3aed" />
-                          <stop offset="100%" stopColor="#4f46e5" />
+                          <stop offset="0%" stopColor="#1677C8" />
+                          <stop offset="100%" stopColor="#18E0C0" />
                         </linearGradient>
                       </defs>
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-lg font-bold text-violet-600 dark:text-violet-400">
+                      <span className="text-lg font-bold text-[#1677C8]">
                         {Math.round(((progressStep + 1) / STEPS.length) * 100)}%
                       </span>
                     </div>
@@ -396,7 +396,7 @@ const BulkImportModal = ({ isOpen, onClose, onImported }) => {
                     <button onClick={reset} className="btn-outline flex-1 py-2.5 text-sm">Import Another File</button>
                     <button
                       onClick={handleClose}
-                      className="flex-1 py-2.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:opacity-90 shadow-md transition-all"
+                      className="flex-1 py-2.5 text-sm font-semibold rounded-xl bg-[#1677C8] text-white hover:bg-[#0B5FA5] shadow-md transition-all cursor-pointer"
                     >
                       Done
                     </button>
