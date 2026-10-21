@@ -4,6 +4,7 @@ const Application = require('../models/Application');
 const Notification = require('../models/Notification');
 const Category = require('../models/Category');
 const Report = require('../models/Report');
+const Announcement = require('../models/Announcement');
 const path   = require('path');
 
 // ─── Admin dashboard stats ─────────────────────────────────────────────────
@@ -184,7 +185,60 @@ exports.deleteReport = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-// ─── Announcements / Notifications ───────────────────────────────────────
+// ─── Announcements ───────────────────────────────────────────────────────
+exports.getAnnouncements = async (req, res, next) => {
+  try {
+    const announcements = await Announcement.find()
+      .populate('createdBy', 'name email')
+      .sort('-createdAt');
+    res.json({ success: true, announcements: announcements || [] });
+  } catch (err) { next(err); }
+};
+
+exports.createAnnouncement = async (req, res, next) => {
+  try {
+    const { title, message } = req.body;
+    if (!title || !title.trim() || !message || !message.trim()) {
+      return res.status(400).json({ success: false, message: 'Title and message are required' });
+    }
+
+    const announcement = await Announcement.create({
+      title: title.trim(),
+      message: message.trim(),
+      createdBy: req.user.id,
+    });
+
+    const students = await User.find({ role: 'student' }).select('_id');
+    if (students.length > 0) {
+      const notifications = students.map((student) => ({
+        recipient: student._id,
+        sender: req.user.id,
+        type: 'system',
+        title: title.trim(),
+        message: message.trim(),
+      }));
+      await Notification.insertMany(notifications).catch((e) => console.error('Notification creation warning:', e.message));
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Announcement broadcasted successfully',
+      announcement,
+    });
+  } catch (err) { next(err); }
+};
+
+exports.deleteAnnouncement = async (req, res, next) => {
+  try {
+    const announcement = await Announcement.findById(req.params.id);
+    if (!announcement) {
+      return res.status(404).json({ success: false, message: 'Announcement not found' });
+    }
+    await announcement.deleteOne();
+    res.json({ success: true, message: 'Announcement removed successfully' });
+  } catch (err) { next(err); }
+};
+
 exports.broadcastNotification = async (req, res, next) => {
   try {
     const { title, message, link } = req.body;

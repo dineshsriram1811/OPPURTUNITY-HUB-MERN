@@ -11,7 +11,7 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden">
-      {/* Sidebar */}
+      {/* Sidebar */}\
       <Sidebar />
 
       {/* Mobile overlay backdrop */}

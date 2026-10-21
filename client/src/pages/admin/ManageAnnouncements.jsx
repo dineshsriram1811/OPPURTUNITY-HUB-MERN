@@ -114,7 +114,7 @@ const ManageAnnouncements = () => {
           {loading ? (
             <div className="py-12 flex justify-center"><LoadingSpinner size="lg" color="#1677D2" /></div>
           ) : announcements.length === 0 ? (
-            <div className="text-center py-12 text-[#62748A] text-sm">No announcements broadcasted yet.</div>
+            <div className="text-center py-12 text-[#62748A] text-sm">No announcements broadcast yet.</div>
           ) : (
             <div className="divide-y divide-[#D9E5EF]">
               {announcements.map(item => (

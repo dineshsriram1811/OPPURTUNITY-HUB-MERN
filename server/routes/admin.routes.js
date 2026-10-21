@@ -5,6 +5,7 @@ const {
   getCategories, addCategory, updateCategory, deleteCategory,
   getReports, resolveReport, deleteReport,
   broadcastNotification,
+  getAnnouncements, createAnnouncement, deleteAnnouncement,
   deleteAllOpportunities,
   bulkImportOpportunities,
 } = require('../controllers/admin.controller');
@@ -33,6 +34,9 @@ router.put( '/reports/:id/resolve',         ...adminOnly, resolveReport);
 router.delete('/reports/:id',               ...adminOnly, deleteReport);
 
 // ── Announcements ─────────────────────────────────────────────────────────
+router.get( '/announcements',              ...adminOnly, getAnnouncements);
+router.post('/announcements',             ...adminOnly, createAnnouncement);
+router.delete('/announcements/:id',        ...adminOnly, deleteAnnouncement);
 router.post('/notifications/broadcast',     ...adminOnly, broadcastNotification);
 
 // ── Opportunities (admin-level bulk operations) ───────────────────────────
