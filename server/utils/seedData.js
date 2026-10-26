@@ -317,12 +317,12 @@ const generateDemoOpportunities = async () => {
 // ── CLI Entry Point ───────────────────────────────────────────────────────────
 if (require.main === module) {
   const mongoose = require('mongoose');
+  const connectDB = require('../config/db');
   require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 
   (async () => {
     try {
-      await mongoose.connect(process.env.MONGO_URI);
-      console.log('✅ Connected to MongoDB');
+      await connectDB();
       const res = await generateDemoOpportunities();
       console.log(`🎉 Demo opportunities seeded successfully! (${res.count} items)`);
     } catch (err) {

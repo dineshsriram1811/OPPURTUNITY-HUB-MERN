@@ -55,11 +55,12 @@ module.exports = { ensureAdminExists };
 // Only runs when called directly (not when imported as a module)
 if (require.main === module) {
   const mongoose = require('mongoose');
+  const connectDB = require('../config/db');
   require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 
   (async () => {
     try {
-      await mongoose.connect(process.env.MONGO_URI);
+      await connectDB();
       console.log('✅  Connected to MongoDB');
 
       const User = require('../models/User');

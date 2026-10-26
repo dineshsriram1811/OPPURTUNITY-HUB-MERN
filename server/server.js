@@ -28,16 +28,6 @@ const freelancingRoutes = require("./routes/freelancing.routes");
 const hackathonRoutes = require("./routes/hackathon.routes");
 const scholarshipRoutes = require("./routes/scholarship.routes");
 
-// ── Connect DB, ensure admin, and seed demo opportunities ───────────────────
-connectDB().then(() => {
-  ensureAdminExists().catch((err) =>
-    console.error('⚠️  Admin ensure failed:', err.message)
-  );
-  generateDemoOpportunities()
-    .then((res) => console.log(`✅  Demo opportunities verified (${res.count} items)`))
-    .catch((err) => console.error('⚠️  Demo seed failed:', err.message));
-});
-
 const app    = express();
 const server = http.createServer(app);
 
@@ -121,13 +111,42 @@ app.use(errorHandler);
 
 // ── Start Server ──────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`🚀  Opportunity Hub Server`);
-  console.log(`📡  Port    : ${PORT}`);
-  console.log(`🌍  Mode    : ${process.env.NODE_ENV}`);
-  console.log(`🏥  Health  : http://localhost:${PORT}/api/health`);
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-});
+
+const startServer = async () => {
+  try {
+    // 1. Connect to MongoDB Atlas
+    await connectDB();
+
+    // 2. Perform database-dependent initialization tasks
+    try {
+      await ensureAdminExists();
+    } catch (err) {
+      console.error('⚠️  Admin ensure failed:', err.message);
+    }
+
+    try {
+      const res = await generateDemoOpportunities();
+      console.log(`✅  Demo opportunities verified (${res.count} items)`);
+    } catch (err) {
+      console.error('⚠️  Demo seed failed:', err.message);
+    }
+
+    // 3. Start listening only after DB and dependencies are ready
+    server.listen(PORT, () => {
+      console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log(`🚀  Opportunity Hub Server`);
+      console.log(`📡  Port    : ${PORT}`);
+      console.log(`🌍  Mode    : ${process.env.NODE_ENV}`);
+      console.log(`🏥  Health  : http://localhost:${PORT}/api/health`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+    });
+  } catch (error) {
+    console.error('🛑  Application startup failed due to database connection error.');
+    process.exit(1);
+  }
+};
+
+startServer();
 
 module.exports = { app, io };
+
