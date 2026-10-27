@@ -21,6 +21,11 @@ const connectDB = async () => {
     throw new Error('MONGO_URI is missing');
   }
 
+  // Reuse existing connection if already established (serverless optimization)
+  if (mongoose.connection && mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
   // Safely extract cluster host and db name for diagnostics without exposing credentials
   let targetHost = 'unknown';
   let targetDb = 'unknown';
