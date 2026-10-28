@@ -141,16 +141,16 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ── Root & Health Check ───────────────────────────────────────────────────────
-app.get('/', (req, res) => {
+const rootHandler = (req, res) => {
   res.json({
     status: 'OK',
     message: 'Opportunity Hub API Server is running',
     health: '/api/health',
     version: '2.0.0',
   });
-});
+};
 
-app.get('/api/health', (req, res) => {
+const healthHandler = (req, res) => {
   const dbStates = ['disconnected', 'connected', 'connecting', 'disconnecting'];
   const dbStatus = mongoose.connection ? (dbStates[mongoose.connection.readyState] || 'unknown') : 'unknown';
 
@@ -162,7 +162,12 @@ app.get('/api/health', (req, res) => {
     database: dbStatus,
     version: '2.0.0',
   });
-});
+};
+
+app.get('/', rootHandler);
+app.get('/api', rootHandler);
+app.get('/api/health', healthHandler);
+app.get('/health', healthHandler);
 
 // ── Database Initialization (Serverless & Warm Instance Support) ─────────────
 let isInitialized = false;
@@ -203,7 +208,14 @@ const initDB = async () => {
 // Middleware: ensure DB is connected before processing API requests
 app.use(async (req, res, next) => {
   // Preflight requests, health check, root, and static files respond without DB wait
-  if (req.method === 'OPTIONS' || req.path === '/api/health' || req.path === '/' || req.path.startsWith('/uploads')) {
+  if (
+    req.method === 'OPTIONS' ||
+    req.path === '/api/health' ||
+    req.path === '/health' ||
+    req.path === '/' ||
+    req.path === '/api' ||
+    req.path.startsWith('/uploads')
+  ) {
     return next();
   }
 
