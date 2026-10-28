@@ -33,10 +33,74 @@ const scholarshipRoutes = require("./routes/scholarship.routes");
 const app    = express();
 const server = http.createServer(app);
 
+// ── CORS & Origin Resolution ──────────────────────────────────────────────────
+const parseAllowedOrigins = () => {
+  const rawOrigins = [
+    process.env.CLIENT_URL,
+    process.env.FRONTEND_URL,
+    process.env.ALLOWED_ORIGINS,
+  ];
+
+  const origins = [];
+
+  for (const raw of rawOrigins) {
+    if (!raw) continue;
+    const parts = raw.split(',');
+    for (const part of parts) {
+      const trimmed = part.trim().replace(/\/+$/, '');
+      if (trimmed) {
+        origins.push(trimmed);
+      }
+    }
+  }
+
+  const defaultDevOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:4173',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:4173',
+  ];
+
+  for (const dev of defaultDevOrigins) {
+    if (!origins.includes(dev)) {
+      origins.push(dev);
+    }
+  }
+
+  return origins;
+};
+
+const isOriginAllowed = (origin) => {
+  if (!origin) return true; // allow non-browser or same-origin requests (e.g. server-to-server, curl)
+  const normalized = origin.trim().replace(/\/+$/, '');
+  const allowed = parseAllowedOrigins();
+  return allowed.includes(normalized);
+};
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (isOriginAllowed(origin)) {
+      return callback(null, true);
+    }
+    return callback(null, false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  optionsSuccessStatus: 200,
+};
+
 // ── Socket.io ─────────────────────────────────────────────────────────────────
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+      if (!origin || isOriginAllowed(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    },
     methods: ['GET', 'POST'],
     credentials: true,
   },
@@ -53,14 +117,15 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => console.log(`Socket disconnected: ${socket.id}`));
 });
 
-// ── Security Middleware ───────────────────────────────────────────────────────
-app.use(helmet({ crossOriginEmbedderPolicy: false }));
-app.use(cors({
-  origin: [process.env.CLIENT_URL || 'http://localhost:5173', 'http://localhost:3000'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+// ── Security & Preflight Middleware ───────────────────────────────────────────
+app.use(helmet({
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
+
+// Apply CORS middleware and handle OPTIONS preflight immediately
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // ── Rate Limiting ─────────────────────────────────────────────────────────────
 app.use('/api/', generalLimiter);
@@ -137,8 +202,8 @@ const initDB = async () => {
 
 // Middleware: ensure DB is connected before processing API requests
 app.use(async (req, res, next) => {
-  // Allow health check, root, and static files to respond without DB wait
-  if (req.path === '/api/health' || req.path === '/' || req.path.startsWith('/uploads')) {
+  // Preflight requests, health check, root, and static files respond without DB wait
+  if (req.method === 'OPTIONS' || req.path === '/api/health' || req.path === '/' || req.path.startsWith('/uploads')) {
     return next();
   }
 
@@ -151,19 +216,42 @@ app.use(async (req, res, next) => {
   }
 });
 
-// ── API Routes ────────────────────────────────────────────────────────────────
+// ── API Routes (mounted with /api prefix and root prefix for baseURL compatibility) ──
 app.use('/api/public',        publicRoutes);       // Public — no auth required
+app.use('/public',            publicRoutes);
+
 app.use('/api/auth',          authRoutes);
+app.use('/auth',              authRoutes);
+
 app.use('/api/users',         userRoutes);
+app.use('/users',             userRoutes);
+
 app.use('/api/opportunities', opportunityRoutes);
+app.use('/opportunities',     opportunityRoutes);
+
 app.use('/api/applications',  applicationRoutes);
+app.use('/applications',      applicationRoutes);
+
 app.use('/api/notifications', notificationRoutes);
+app.use('/notifications',     notificationRoutes);
+
 app.use('/api/admin',         adminRoutes);
+app.use('/admin',             adminRoutes);
+
 app.use('/api/jobs',          jobRoutes);
+app.use('/jobs',              jobRoutes);
+
 app.use('/api/internships',   internshipRoutes);
+app.use('/internships',       internshipRoutes);
+
 app.use('/api/freelancing',   freelancingRoutes);
+app.use('/freelancing',       freelancingRoutes);
+
 app.use('/api/hackathons',    hackathonRoutes);
+app.use('/hackathons',        hackathonRoutes);
+
 app.use('/api/scholarships',  scholarshipRoutes);
+app.use('/scholarships',      scholarshipRoutes);
 
 // ── 404 Handler ───────────────────────────────────────────────────────────────
 app.use('*', (req, res) => {
@@ -181,7 +269,7 @@ const PORT = process.env.PORT || 5000;
 
 // In Vercel serverless functions, Vercel invokes the exported app directly.
 // Only bind to a network port when running outside of Vercel (local dev or traditional VPS).
-if (!process.env.VERCEL) {
+if (!process.env.VERCEL && require.main === module) {
   const startServer = async () => {
     try {
       await initDB();
